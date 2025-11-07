@@ -43,6 +43,7 @@ public class BuildingPlacement : MonoBehaviour
         if (_blockPreview != null)
             Destroy(_blockPreview);
         
+        blockPrefab = block;
         _blockPreview = Instantiate(block.PreviewPrefab);
         _blockPreview.SetActive(false);
         _rotatedBlockPositions = new List<Vector3Int>(blockPrefab.Positions);
@@ -115,10 +116,15 @@ public class BuildingPlacement : MonoBehaviour
         if (!_blockPreview.activeSelf) return;
         
         var turnAngle = Mathf.Sign(turnDirection) * 90f;
+        var camZ = _cam.transform.position.z;
+        var camX = _cam.transform.position.x;
 
-        var axis = _cam.transform.forward.z > _cam.transform.forward.x ? Vector3Int.right : Vector3Int.forward;
+        var axis = Mathf.Abs(camZ) > Mathf.Abs(camX) ? 
+            -Mathf.RoundToInt(Mathf.Sign(camZ)) * Vector3Int.right : 
+            Mathf.RoundToInt(Mathf.Sign(camX)) * Vector3Int.forward;
         _blockPreview.transform.Rotate(axis, turnAngle, Space.World);
         
+        //FIX ROtation Directions be same
         RotateBlockPositions(turnDirection, axis);
     }
 

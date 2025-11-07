@@ -40,6 +40,24 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Turn Camera Right",
+                    "type": "Button",
+                    "id": "ce293862-2290-488a-a466-d23155a30c69",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Turn Camera Left",
+                    "type": "Button",
+                    "id": "9f51ecec-fe6d-46a6-b91b-dac0a0b316ee",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -130,6 +148,28 @@
                     "action": "Turn Vertically",
                     "isComposite": false,
                     "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "27f65164-2b95-47bf-9a51-7670a49d4aa6",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Turn Camera Right",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "2384716b-9d8f-4a02-a37e-9ae60e8a5a67",
+                    "path": "<Keyboard>/q",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Turn Camera Left",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         }

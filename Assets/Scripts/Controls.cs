@@ -126,6 +126,24 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Turn Camera Right"",
+                    ""type"": ""Button"",
+                    ""id"": ""ce293862-2290-488a-a466-d23155a30c69"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Turn Camera Left"",
+                    ""type"": ""Button"",
+                    ""id"": ""9f51ecec-fe6d-46a6-b91b-dac0a0b316ee"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -216,6 +234,28 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""action"": ""Turn Vertically"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""27f65164-2b95-47bf-9a51-7670a49d4aa6"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Turn Camera Right"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2384716b-9d8f-4a02-a37e-9ae60e8a5a67"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Turn Camera Left"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -228,6 +268,8 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         m_Player_Click = m_Player.FindAction("Click", throwIfNotFound: true);
         m_Player_TurnHorizontally = m_Player.FindAction("Turn Horizontally", throwIfNotFound: true);
         m_Player_TurnVertically = m_Player.FindAction("Turn Vertically", throwIfNotFound: true);
+        m_Player_TurnCameraRight = m_Player.FindAction("Turn Camera Right", throwIfNotFound: true);
+        m_Player_TurnCameraLeft = m_Player.FindAction("Turn Camera Left", throwIfNotFound: true);
     }
 
     ~@Controls()
@@ -312,6 +354,8 @@ public partial class @Controls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Click;
     private readonly InputAction m_Player_TurnHorizontally;
     private readonly InputAction m_Player_TurnVertically;
+    private readonly InputAction m_Player_TurnCameraRight;
+    private readonly InputAction m_Player_TurnCameraLeft;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -339,6 +383,14 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/TurnVertically".
         /// </summary>
         public InputAction @TurnVertically => m_Wrapper.m_Player_TurnVertically;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/TurnCameraRight".
+        /// </summary>
+        public InputAction @TurnCameraRight => m_Wrapper.m_Player_TurnCameraRight;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/TurnCameraLeft".
+        /// </summary>
+        public InputAction @TurnCameraLeft => m_Wrapper.m_Player_TurnCameraLeft;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -377,6 +429,12 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @TurnVertically.started += instance.OnTurnVertically;
             @TurnVertically.performed += instance.OnTurnVertically;
             @TurnVertically.canceled += instance.OnTurnVertically;
+            @TurnCameraRight.started += instance.OnTurnCameraRight;
+            @TurnCameraRight.performed += instance.OnTurnCameraRight;
+            @TurnCameraRight.canceled += instance.OnTurnCameraRight;
+            @TurnCameraLeft.started += instance.OnTurnCameraLeft;
+            @TurnCameraLeft.performed += instance.OnTurnCameraLeft;
+            @TurnCameraLeft.canceled += instance.OnTurnCameraLeft;
         }
 
         /// <summary>
@@ -400,6 +458,12 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @TurnVertically.started -= instance.OnTurnVertically;
             @TurnVertically.performed -= instance.OnTurnVertically;
             @TurnVertically.canceled -= instance.OnTurnVertically;
+            @TurnCameraRight.started -= instance.OnTurnCameraRight;
+            @TurnCameraRight.performed -= instance.OnTurnCameraRight;
+            @TurnCameraRight.canceled -= instance.OnTurnCameraRight;
+            @TurnCameraLeft.started -= instance.OnTurnCameraLeft;
+            @TurnCameraLeft.performed -= instance.OnTurnCameraLeft;
+            @TurnCameraLeft.canceled -= instance.OnTurnCameraLeft;
         }
 
         /// <summary>
@@ -468,5 +532,19 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnTurnVertically(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Turn Camera Right" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnTurnCameraRight(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Turn Camera Left" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnTurnCameraLeft(InputAction.CallbackContext context);
     }
 }

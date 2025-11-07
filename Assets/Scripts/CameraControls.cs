@@ -1,9 +1,12 @@
 using System;
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.InputSystem.Composites;
 
 public class CameraControls : MonoBehaviour
 {
+    [SerializeField] private PlayerInput playerInput;
+    
     private Tween _rotationTween;
     private Vector3[] _rotationEulers;
     private int _currentRotationIndex;
@@ -17,6 +20,18 @@ public class CameraControls : MonoBehaviour
             new Vector3(0, -180, 0),
             new Vector3(0, -90, 0),
         };
+    }
+
+    private void OnEnable()
+    {
+        playerInput.OnCameraTurnRight += RotateRight;
+        playerInput.OnCameraTurnLeft += RotateLeft;
+    }
+    
+    private void OnDisable()
+    {
+        playerInput.OnCameraTurnRight -= RotateRight;
+        playerInput.OnCameraTurnLeft -= RotateLeft;
     }
     
     [ContextMenu("RotateRight")]
