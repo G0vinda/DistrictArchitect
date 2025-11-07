@@ -108,6 +108,24 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Turn Horizontally"",
+                    ""type"": ""Button"",
+                    ""id"": ""ad250cb2-f607-4198-bdac-2761d2644407"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Turn Vertically"",
+                    ""type"": ""Button"",
+                    ""id"": ""578e02d8-ae5d-464d-a2f1-32da6d6033b9"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -132,6 +150,72 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""action"": ""Click"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""1D Axis"",
+                    ""id"": ""7e4b6406-07fd-46f1-b0a0-4a6979eb638f"",
+                    ""path"": ""1DAxis"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Turn Horizontally"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""negative"",
+                    ""id"": ""6080c14d-6ce5-4c52-af15-07fc6ed5ccf6"",
+                    ""path"": ""<Keyboard>/a"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Turn Horizontally"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""positive"",
+                    ""id"": ""b25d97a3-28e2-4250-925c-4c5b72ef062a"",
+                    ""path"": ""<Keyboard>/d"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Turn Horizontally"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""1D Axis"",
+                    ""id"": ""d80d50b8-6220-41bd-ac17-a0ea72a5b668"",
+                    ""path"": ""1DAxis"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Turn Vertically"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""positive"",
+                    ""id"": ""f5c918a9-ac53-49eb-b78f-e709628afe0e"",
+                    ""path"": ""<Keyboard>/w"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Turn Vertically"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""negative"",
+                    ""id"": ""017f1ac0-ce2d-4dfe-a52d-48bc71573d3e"",
+                    ""path"": ""<Keyboard>/s"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Turn Vertically"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
                 }
             ]
         }
@@ -142,6 +226,8 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
         m_Player_MousePosition = m_Player.FindAction("MousePosition", throwIfNotFound: true);
         m_Player_Click = m_Player.FindAction("Click", throwIfNotFound: true);
+        m_Player_TurnHorizontally = m_Player.FindAction("Turn Horizontally", throwIfNotFound: true);
+        m_Player_TurnVertically = m_Player.FindAction("Turn Vertically", throwIfNotFound: true);
     }
 
     ~@Controls()
@@ -224,6 +310,8 @@ public partial class @Controls: IInputActionCollection2, IDisposable
     private List<IPlayerActions> m_PlayerActionsCallbackInterfaces = new List<IPlayerActions>();
     private readonly InputAction m_Player_MousePosition;
     private readonly InputAction m_Player_Click;
+    private readonly InputAction m_Player_TurnHorizontally;
+    private readonly InputAction m_Player_TurnVertically;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -243,6 +331,14 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/Click".
         /// </summary>
         public InputAction @Click => m_Wrapper.m_Player_Click;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/TurnHorizontally".
+        /// </summary>
+        public InputAction @TurnHorizontally => m_Wrapper.m_Player_TurnHorizontally;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/TurnVertically".
+        /// </summary>
+        public InputAction @TurnVertically => m_Wrapper.m_Player_TurnVertically;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -275,6 +371,12 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @Click.started += instance.OnClick;
             @Click.performed += instance.OnClick;
             @Click.canceled += instance.OnClick;
+            @TurnHorizontally.started += instance.OnTurnHorizontally;
+            @TurnHorizontally.performed += instance.OnTurnHorizontally;
+            @TurnHorizontally.canceled += instance.OnTurnHorizontally;
+            @TurnVertically.started += instance.OnTurnVertically;
+            @TurnVertically.performed += instance.OnTurnVertically;
+            @TurnVertically.canceled += instance.OnTurnVertically;
         }
 
         /// <summary>
@@ -292,6 +394,12 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @Click.started -= instance.OnClick;
             @Click.performed -= instance.OnClick;
             @Click.canceled -= instance.OnClick;
+            @TurnHorizontally.started -= instance.OnTurnHorizontally;
+            @TurnHorizontally.performed -= instance.OnTurnHorizontally;
+            @TurnHorizontally.canceled -= instance.OnTurnHorizontally;
+            @TurnVertically.started -= instance.OnTurnVertically;
+            @TurnVertically.performed -= instance.OnTurnVertically;
+            @TurnVertically.canceled -= instance.OnTurnVertically;
         }
 
         /// <summary>
@@ -346,5 +454,19 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnClick(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Turn Horizontally" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnTurnHorizontally(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Turn Vertically" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnTurnVertically(InputAction.CallbackContext context);
     }
 }

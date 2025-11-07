@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using TMPro;
+using Unity.Mathematics.Geometry;
 using UnityEngine;
 
 public class BuildingPlacement : MonoBehaviour
@@ -25,6 +26,8 @@ public class BuildingPlacement : MonoBehaviour
     {
         playerInput.OnMousePositionChanged += CheckForEmptyBuildingSlot;
         playerInput.OnMouseClicked += TryPlaceBuilding;
+        playerInput.OnVerticalTurn += TurnPreviewVertically;
+        playerInput.OnHorizontalTurn += TurnPreviewHorizontally;
     }
 
     private void OnDisable()
@@ -70,5 +73,25 @@ public class BuildingPlacement : MonoBehaviour
                 grid.PlaceAtArea(hitArea);
             }
         }
+    }
+
+    private void TurnPreviewHorizontally(float turnDirection)
+    {
+        if (!blockPreview.activeSelf) return;
+
+        var turnAngle = Mathf.Sign(turnDirection) * 90f;
+        Debug.Log(turnAngle);
+
+        blockPreview.transform.Rotate(Vector3.up, turnAngle);
+    }
+
+    private void TurnPreviewVertically(float turnDirection)
+    {
+        if (!blockPreview.activeSelf) return;
+        
+        var turnAngle = Mathf.Sign(turnDirection) * 90f;
+
+        var axis = cam.transform.forward.z > cam.transform.forward.x ? Vector3.right : Vector3.forward;
+        blockPreview.transform.Rotate(axis, turnAngle);
     }
 }

@@ -9,6 +9,8 @@ public class PlayerInput : ScriptableObject, Controls.IPlayerActions
     
     public Action<Vector2> OnMousePositionChanged;
     public Action OnMouseClicked;
+    public Action<float> OnHorizontalTurn;
+    public Action<float> OnVerticalTurn;
     
     Controls controls;
     
@@ -43,5 +45,23 @@ public class PlayerInput : ScriptableObject, Controls.IPlayerActions
             return;
         
         OnMouseClicked?.Invoke();
+    }
+
+    public void OnTurnHorizontally(InputAction.CallbackContext context)
+    {
+        if (!context.performed)
+            return;
+
+        var turnDirection = context.ReadValue<float>();
+        OnHorizontalTurn?.Invoke(turnDirection);
+    }
+
+    public void OnTurnVertically(InputAction.CallbackContext context)
+    {
+        if (!context.performed)
+            return;
+
+        var turnDirection = context.ReadValue<float>();
+        OnVerticalTurn?.Invoke(turnDirection);
     }
 }
