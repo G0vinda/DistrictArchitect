@@ -9,6 +9,8 @@ public class Grid
     public const int MAP_SIZE = 6;
     public const float CELL_SIZE = 1f;
     public const float BLOCK_OFFSET = 0.5f;
+    
+    private const float Y_BUFFER = 0.05f;
 
     public Grid()
     {
@@ -33,7 +35,7 @@ public class Grid
     {
         return new Vector3Int(
             Mathf.FloorToInt(position.x / CELL_SIZE),
-            0,
+            Mathf.FloorToInt(position.y + Y_BUFFER / CELL_SIZE),
             Mathf.FloorToInt(position.z / CELL_SIZE));
     }
 
