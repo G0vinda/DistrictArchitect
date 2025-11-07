@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Sirenix.Utilities;
 using UnityEngine;
 
 public class Grid
@@ -9,16 +10,17 @@ public class Grid
     public const int MAP_SIZE = 6;
     public const float CELL_SIZE = 1f;
     public const float BLOCK_OFFSET = 0.5f;
-    
-    private const float Y_BUFFER = 0.05f;
 
     public Grid()
     {
         for (var x = 0; x < MAP_SIZE; x++)
         {
-            for (var z = 0; z < MAP_SIZE; z++)
+            for (var y = 0; y < MAP_SIZE; y++)
             {
-                grid.Add(new Vector3Int(x, 0, z), false);
+                for (var z = 0; z < MAP_SIZE; z++)
+                {
+                    grid.Add(new Vector3Int(x, y, z), false);
+                }   
             }
         }
     }
@@ -27,7 +29,7 @@ public class Grid
     
     public bool IsEmptyAt(Vector3Int coordinates) => !grid[coordinates];
     
-    public bool PlaceAtArea(IEnumerable<Vector3Int> area) => area.All(coord => grid[coord] = true); 
+    public void PlaceAtArea(IEnumerable<Vector3Int> area) => area.ForEach(coord => grid[coord] = true); 
     
     public void PlaceAt(Vector3Int coordinates) => grid[coordinates] = true;
     
@@ -35,7 +37,7 @@ public class Grid
     {
         return new Vector3Int(
             Mathf.FloorToInt(position.x / CELL_SIZE),
-            Mathf.FloorToInt(position.y + Y_BUFFER / CELL_SIZE),
+            Mathf.FloorToInt(position.y / CELL_SIZE),
             Mathf.FloorToInt(position.z / CELL_SIZE));
     }
 

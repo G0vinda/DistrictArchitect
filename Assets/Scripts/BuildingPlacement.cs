@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using TMPro;
 using UnityEngine;
 
@@ -39,7 +38,7 @@ public class BuildingPlacement : MonoBehaviour
         var mouseRay = cam.ScreenPointToRay(mousePosition);
         if (Physics.Raycast(mouseRay, out var hit))
         {
-            var hitGridCoordinates = Grid.WorldPositionToGridCoordinates(hit.point);
+            var hitGridCoordinates = Grid.WorldPositionToGridCoordinates(hit.point + 0.1f * hit.normal);
             if (lastHoveredGridCoordinates != null && hitGridCoordinates == lastHoveredGridCoordinates.Value)
                 return;
             
