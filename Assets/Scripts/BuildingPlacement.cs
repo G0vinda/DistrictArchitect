@@ -1,6 +1,6 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using TMPro;
-using Unity.Mathematics.Geometry;
 using UnityEngine;
 
 public class BuildingPlacement : MonoBehaviour
@@ -9,17 +9,17 @@ public class BuildingPlacement : MonoBehaviour
     [SerializeField] BuildingBlock blockPrefab;
     [SerializeField] TextMeshProUGUI debugHoverText;
     
-    private Grid grid;
-    private Camera cam;
-    private GameObject blockPreview;
-    private Vector3Int? lastHoveredGridCoordinates = null;
+    private Grid _grid;
+    private Camera _cam;
+    private GameObject _blockPreview;
+    private List<Vector3Int> _rotatedBlockPositions;
+    private Vector3Int? _lastHoveredGridCoordinates = null;
     
     private void Start()
     {
-        grid = new Grid();
-        cam = Camera.main;
-        blockPreview = Instantiate(blockPrefab.PreviewPrefab);
-        blockPreview.SetActive(false);
+        _grid = new Grid();
+        _cam = Camera.main;
+        SelectBlock(blockPrefab);
     }
 
     private void OnEnable()
@@ -36,62 +36,87 @@ public class BuildingPlacement : MonoBehaviour
         playerInput.OnMouseClicked -= TryPlaceBuilding;
     }
 
+    public void SelectBlock(BuildingBlock block)
+    {
+        if (_blockPreview != null)
+            Destroy(_blockPreview);
+        
+        _blockPreview = Instantiate(block.PreviewPrefab);
+        _blockPreview.SetActive(false);
+        _rotatedBlockPositions = new List<Vector3Int>(blockPrefab.Positions);
+    }
+
     private void CheckForEmptyBuildingSlot(Vector2 mousePosition)
     {
-        var mouseRay = cam.ScreenPointToRay(mousePosition);
+        var mouseRay = _cam.ScreenPointToRay(mousePosition);
         if (Physics.Raycast(mouseRay, out var hit))
         {
             var hitGridCoordinates = Grid.WorldPositionToGridCoordinates(hit.point + 0.1f * hit.normal);
-            if (lastHoveredGridCoordinates != null && hitGridCoordinates == lastHoveredGridCoordinates.Value)
+            if (_lastHoveredGridCoordinates != null && hitGridCoordinates == _lastHoveredGridCoordinates.Value)
                 return;
             
             debugHoverText.text = $"Hovering:{hitGridCoordinates}";
-            lastHoveredGridCoordinates = hitGridCoordinates;
-            var hitArea = blockPrefab.Positions.Select(pos => pos + hitGridCoordinates).ToList();
-            if (grid.IsEmptyAtArea(hitArea))
+            _lastHoveredGridCoordinates = hitGridCoordinates;
+            var hitArea = _rotatedBlockPositions.Select(pos => pos + hitGridCoordinates).ToList();
+            if (_grid.IsEmptyAtArea(hitArea))
             {
-                blockPreview.transform.position = Grid.GridCoordinatesToWorldPosition(hitGridCoordinates);
-                blockPreview.SetActive(true);
+                _blockPreview.transform.position = Grid.GridCoordinatesToWorldPosition(hitGridCoordinates);
+                _blockPreview.SetActive(true);
                 return;
             }
         }
-        blockPreview.SetActive(false);
+        else
+        {
+            _lastHoveredGridCoordinates = null;
+        }
+        _blockPreview.SetActive(false);
     }
 
     private void TryPlaceBuilding()
     {
-        var mouseRay = cam.ScreenPointToRay(playerInput.MousePosition);
+        var mouseRay = _cam.ScreenPointToRay(playerInput.MousePosition);
         if (Physics.Raycast(mouseRay, out var hit))
         {
             var hitGridCoordinates = Grid.WorldPositionToGridCoordinates(hit.point);
-            var hitArea = blockPrefab.Positions.Select(pos => pos + hitGridCoordinates);
+            var hitArea = _rotatedBlockPositions.Select(pos => pos + hitGridCoordinates).ToList();
             Debug.Log($"Hit at grid coordinates: {hitGridCoordinates}");
-            if (grid.IsEmptyAtArea(hitArea))
+            if (_grid.IsEmptyAtArea(hitArea))
             {
                 var newBlockPosition = Grid.GridCoordinatesToWorldPosition(hitGridCoordinates);
-                Instantiate(blockPrefab, newBlockPosition, Quaternion.identity);
-                grid.PlaceAtArea(hitArea);
+                var rotation = _blockPreview.transform.rotation;
+                Instantiate(blockPrefab, newBlockPosition, rotation);
+                _grid.PlaceAtArea(hitArea);
+                SelectBlock(blockPrefab);
             }
         }
     }
 
     private void TurnPreviewHorizontally(float turnDirection)
     {
-        if (!blockPreview.activeSelf) return;
+        if (!_blockPreview.activeSelf) return;
 
         var turnAngle = Mathf.Sign(turnDirection) * 90f;
         Debug.Log(turnAngle);
 
-        blockPreview.transform.Rotate(Vector3.up, turnAngle);
+        _blockPreview.transform.Rotate(Vector3.up, turnAngle, Space.World);
+
+        RotateBlockPositions(turnDirection, Vector3Int.up);
     }
 
     private void TurnPreviewVertically(float turnDirection)
     {
-        if (!blockPreview.activeSelf) return;
+        if (!_blockPreview.activeSelf) return;
         
         var turnAngle = Mathf.Sign(turnDirection) * 90f;
 
-        var axis = cam.transform.forward.z > cam.transform.forward.x ? Vector3.right : Vector3.forward;
-        blockPreview.transform.Rotate(axis, turnAngle);
+        var axis = _cam.transform.forward.z > _cam.transform.forward.x ? Vector3Int.right : Vector3Int.forward;
+        _blockPreview.transform.Rotate(axis, turnAngle, Space.World);
+        
+        RotateBlockPositions(turnDirection, axis);
+    }
+
+    private void RotateBlockPositions(float turnDirection, Vector3Int axis)
+    {
+        _rotatedBlockPositions = _rotatedBlockPositions.ConvertAll(pos => pos.Rotate(axis, Mathf.RoundToInt(turnDirection)));
     }
 }

@@ -24,8 +24,11 @@ public class Grid
             }
         }
     }
-    
-    public bool IsEmptyAtArea(IEnumerable<Vector3Int> area) => area.All(coord => grid.ContainsKey(coord) && !grid[coord]);
+
+    public bool IsEmptyAtArea(IEnumerable<Vector3Int> area)
+    {
+        return area.All(coord => grid.ContainsKey(coord) && !grid[coord]);
+    }
     
     public bool IsEmptyAt(Vector3Int coordinates) => !grid[coordinates];
     
