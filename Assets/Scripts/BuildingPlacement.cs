@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Sirenix.Serialization;
 using TMPro;
 using UnityEngine;
 
@@ -14,6 +15,7 @@ public class BuildingPlacement : MonoBehaviour
     private GameObject _blockPreview;
     private List<Vector3Int> _rotatedBlockPositions;
     private Vector3Int? _lastHoveredGridCoordinates = null;
+    private Vector3Int blockOffset = new Vector3Int(0, 0, 0);
     
     private void Start()
     {
@@ -57,13 +59,15 @@ public class BuildingPlacement : MonoBehaviour
             
             debugHoverText.text = $"Hovering:{hitGridCoordinates}";
             _lastHoveredGridCoordinates = hitGridCoordinates;
-            var hitArea = _rotatedBlockPositions.Select(pos => pos + hitGridCoordinates).ToList();
+            var hitArea = GetHitArea(hitGridCoordinates);
             if (_grid.IsEmptyAtArea(hitArea))
             {
-                _blockPreview.transform.position = Grid.GridCoordinatesToWorldPosition(hitGridCoordinates);
+                _blockPreview.transform.position = GetBlockPositionFromCoordinate(_lastHoveredGridCoordinates.Value);
                 _blockPreview.SetActive(true);
                 return;
             }
+
+            _lastHoveredGridCoordinates = null;
         }
         else
         {
@@ -72,23 +76,26 @@ public class BuildingPlacement : MonoBehaviour
         _blockPreview.SetActive(false);
     }
 
+    private List<Vector3Int> GetHitArea(Vector3Int gridCoordinates)
+    {
+        return _rotatedBlockPositions.Select(pos => pos + gridCoordinates - blockOffset).ToList();
+    }
+
     private void TryPlaceBuilding()
     {
-        var mouseRay = _cam.ScreenPointToRay(playerInput.MousePosition);
-        if (Physics.Raycast(mouseRay, out var hit))
-        {
-            var hitGridCoordinates = Grid.WorldPositionToGridCoordinates(hit.point);
-            var hitArea = _rotatedBlockPositions.Select(pos => pos + hitGridCoordinates).ToList();
-            Debug.Log($"Hit at grid coordinates: {hitGridCoordinates}");
-            if (_grid.IsEmptyAtArea(hitArea))
-            {
-                var newBlockPosition = Grid.GridCoordinatesToWorldPosition(hitGridCoordinates);
-                var rotation = _blockPreview.transform.rotation;
-                Instantiate(blockPrefab, newBlockPosition, rotation);
-                _grid.PlaceAtArea(hitArea);
-                SelectBlock(blockPrefab);
-            }
-        }
+        if (_lastHoveredGridCoordinates == null) return;
+        
+        var hitArea = GetHitArea(_lastHoveredGridCoordinates.Value).ToList();
+        var newBlockPosition = GetBlockPositionFromCoordinate(_lastHoveredGridCoordinates.Value);
+        Instantiate(blockPrefab, newBlockPosition, _blockPreview.transform.rotation);
+        _grid.PlaceAtArea(hitArea);
+        SelectBlock(blockPrefab);
+    }
+
+    private Vector3 GetBlockPositionFromCoordinate(Vector3Int coordinate)
+    {
+        var newBlockPosition = Grid.GridCoordinatesToWorldPosition(coordinate) - blockOffset;
+        return newBlockPosition;
     }
 
     private void TurnPreviewHorizontally(float turnDirection)
@@ -118,5 +125,13 @@ public class BuildingPlacement : MonoBehaviour
     private void RotateBlockPositions(float turnDirection, Vector3Int axis)
     {
         _rotatedBlockPositions = _rotatedBlockPositions.ConvertAll(pos => pos.Rotate(axis, Mathf.RoundToInt(turnDirection)));
+        blockOffset = _rotatedBlockPositions.Aggregate(Vector3Int.zero, (acc, v) => v.y < acc.y ? v : acc);
+        if (blockOffset.y >= 0)
+        {
+            blockOffset = Vector3Int.zero;
+        }
+        
+        if(_lastHoveredGridCoordinates != null)
+            _blockPreview.transform.position = GetBlockPositionFromCoordinate(_lastHoveredGridCoordinates.Value);
     }
 }
