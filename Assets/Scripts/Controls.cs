@@ -128,18 +128,27 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Turn Camera Right"",
+                    ""name"": ""Change Floor"",
                     ""type"": ""Button"",
-                    ""id"": ""ce293862-2290-488a-a466-d23155a30c69"",
+                    ""id"": ""833ac548-4789-4211-9f84-aae6e2dc506e"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Turn Camera Left"",
+                    ""name"": ""Turn Camera Horizontally"",
                     ""type"": ""Button"",
-                    ""id"": ""9f51ecec-fe6d-46a6-b91b-dac0a0b316ee"",
+                    ""id"": ""b0a8804e-db56-4f9f-a73e-fe6a4ed6c4d1"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Pause"",
+                    ""type"": ""Button"",
+                    ""id"": ""219cb06e-8f2a-4f3f-b1e1-e0f9a4bfe74b"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -236,24 +245,79 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": true
                 },
                 {
-                    ""name"": """",
-                    ""id"": ""27f65164-2b95-47bf-9a51-7670a49d4aa6"",
+                    ""name"": ""1D Axis"",
+                    ""id"": ""9d6dbd44-a35b-4332-843f-ac767d5a6b5d"",
+                    ""path"": ""1DAxis"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Change Floor"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""positive"",
+                    ""id"": ""52d5e92c-f36a-4a40-acb0-698085975369"",
+                    ""path"": ""<Mouse>/scroll/up"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Change Floor"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""negative"",
+                    ""id"": ""3c4b819c-0001-49e2-9500-ed850513ec13"",
+                    ""path"": ""<Mouse>/scroll/down"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Change Floor"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""1D Axis"",
+                    ""id"": ""46e3d286-bba3-401c-906d-d824d4dab865"",
+                    ""path"": ""1DAxis"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Turn Camera Horizontally"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""positive"",
+                    ""id"": ""b50dc7e6-c79a-4d77-b7d7-12228a1a301e"",
                     ""path"": ""<Keyboard>/e"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Turn Camera Right"",
+                    ""action"": ""Turn Camera Horizontally"",
                     ""isComposite"": false,
-                    ""isPartOfComposite"": false
+                    ""isPartOfComposite"": true
                 },
                 {
-                    ""name"": """",
-                    ""id"": ""2384716b-9d8f-4a02-a37e-9ae60e8a5a67"",
+                    ""name"": ""negative"",
+                    ""id"": ""3da7ede8-db6f-4abc-9f79-f9d633b86cee"",
                     ""path"": ""<Keyboard>/q"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Turn Camera Left"",
+                    ""action"": ""Turn Camera Horizontally"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""7b925c27-5c44-453f-9734-ae1c38edc6f7"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Pause"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -268,8 +332,9 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         m_Player_Click = m_Player.FindAction("Click", throwIfNotFound: true);
         m_Player_TurnHorizontally = m_Player.FindAction("Turn Horizontally", throwIfNotFound: true);
         m_Player_TurnVertically = m_Player.FindAction("Turn Vertically", throwIfNotFound: true);
-        m_Player_TurnCameraRight = m_Player.FindAction("Turn Camera Right", throwIfNotFound: true);
-        m_Player_TurnCameraLeft = m_Player.FindAction("Turn Camera Left", throwIfNotFound: true);
+        m_Player_ChangeFloor = m_Player.FindAction("Change Floor", throwIfNotFound: true);
+        m_Player_TurnCameraHorizontally = m_Player.FindAction("Turn Camera Horizontally", throwIfNotFound: true);
+        m_Player_Pause = m_Player.FindAction("Pause", throwIfNotFound: true);
     }
 
     ~@Controls()
@@ -354,8 +419,9 @@ public partial class @Controls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Click;
     private readonly InputAction m_Player_TurnHorizontally;
     private readonly InputAction m_Player_TurnVertically;
-    private readonly InputAction m_Player_TurnCameraRight;
-    private readonly InputAction m_Player_TurnCameraLeft;
+    private readonly InputAction m_Player_ChangeFloor;
+    private readonly InputAction m_Player_TurnCameraHorizontally;
+    private readonly InputAction m_Player_Pause;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -384,13 +450,17 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @TurnVertically => m_Wrapper.m_Player_TurnVertically;
         /// <summary>
-        /// Provides access to the underlying input action "Player/TurnCameraRight".
+        /// Provides access to the underlying input action "Player/ChangeFloor".
         /// </summary>
-        public InputAction @TurnCameraRight => m_Wrapper.m_Player_TurnCameraRight;
+        public InputAction @ChangeFloor => m_Wrapper.m_Player_ChangeFloor;
         /// <summary>
-        /// Provides access to the underlying input action "Player/TurnCameraLeft".
+        /// Provides access to the underlying input action "Player/TurnCameraHorizontally".
         /// </summary>
-        public InputAction @TurnCameraLeft => m_Wrapper.m_Player_TurnCameraLeft;
+        public InputAction @TurnCameraHorizontally => m_Wrapper.m_Player_TurnCameraHorizontally;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/Pause".
+        /// </summary>
+        public InputAction @Pause => m_Wrapper.m_Player_Pause;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -429,12 +499,15 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @TurnVertically.started += instance.OnTurnVertically;
             @TurnVertically.performed += instance.OnTurnVertically;
             @TurnVertically.canceled += instance.OnTurnVertically;
-            @TurnCameraRight.started += instance.OnTurnCameraRight;
-            @TurnCameraRight.performed += instance.OnTurnCameraRight;
-            @TurnCameraRight.canceled += instance.OnTurnCameraRight;
-            @TurnCameraLeft.started += instance.OnTurnCameraLeft;
-            @TurnCameraLeft.performed += instance.OnTurnCameraLeft;
-            @TurnCameraLeft.canceled += instance.OnTurnCameraLeft;
+            @ChangeFloor.started += instance.OnChangeFloor;
+            @ChangeFloor.performed += instance.OnChangeFloor;
+            @ChangeFloor.canceled += instance.OnChangeFloor;
+            @TurnCameraHorizontally.started += instance.OnTurnCameraHorizontally;
+            @TurnCameraHorizontally.performed += instance.OnTurnCameraHorizontally;
+            @TurnCameraHorizontally.canceled += instance.OnTurnCameraHorizontally;
+            @Pause.started += instance.OnPause;
+            @Pause.performed += instance.OnPause;
+            @Pause.canceled += instance.OnPause;
         }
 
         /// <summary>
@@ -458,12 +531,15 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @TurnVertically.started -= instance.OnTurnVertically;
             @TurnVertically.performed -= instance.OnTurnVertically;
             @TurnVertically.canceled -= instance.OnTurnVertically;
-            @TurnCameraRight.started -= instance.OnTurnCameraRight;
-            @TurnCameraRight.performed -= instance.OnTurnCameraRight;
-            @TurnCameraRight.canceled -= instance.OnTurnCameraRight;
-            @TurnCameraLeft.started -= instance.OnTurnCameraLeft;
-            @TurnCameraLeft.performed -= instance.OnTurnCameraLeft;
-            @TurnCameraLeft.canceled -= instance.OnTurnCameraLeft;
+            @ChangeFloor.started -= instance.OnChangeFloor;
+            @ChangeFloor.performed -= instance.OnChangeFloor;
+            @ChangeFloor.canceled -= instance.OnChangeFloor;
+            @TurnCameraHorizontally.started -= instance.OnTurnCameraHorizontally;
+            @TurnCameraHorizontally.performed -= instance.OnTurnCameraHorizontally;
+            @TurnCameraHorizontally.canceled -= instance.OnTurnCameraHorizontally;
+            @Pause.started -= instance.OnPause;
+            @Pause.performed -= instance.OnPause;
+            @Pause.canceled -= instance.OnPause;
         }
 
         /// <summary>
@@ -533,18 +609,25 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnTurnVertically(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "Turn Camera Right" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "Change Floor" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnTurnCameraRight(InputAction.CallbackContext context);
+        void OnChangeFloor(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "Turn Camera Left" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "Turn Camera Horizontally" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnTurnCameraLeft(InputAction.CallbackContext context);
+        void OnTurnCameraHorizontally(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Pause" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnPause(InputAction.CallbackContext context);
     }
 }

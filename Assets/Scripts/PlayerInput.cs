@@ -11,8 +11,7 @@ public class PlayerInput : ScriptableObject, Controls.IPlayerActions
     public Action OnMouseClicked;
     public Action<float> OnHorizontalTurn;
     public Action<float> OnVerticalTurn;
-    public Action OnCameraTurnRight;
-    public Action OnCameraTurnLeft;
+    public Action<float> OnCameraTurn;
     
     Controls controls;
     
@@ -67,19 +66,22 @@ public class PlayerInput : ScriptableObject, Controls.IPlayerActions
         OnVerticalTurn?.Invoke(turnDirection);
     }
 
-    public void OnTurnCameraRight(InputAction.CallbackContext context)
+    public void OnChangeFloor(InputAction.CallbackContext context)
     {
-        if (!context.performed)
-            return;
-        
-        OnCameraTurnRight?.Invoke();
+        throw new NotImplementedException();
     }
 
-    public void OnTurnCameraLeft(InputAction.CallbackContext context)
+    public void OnTurnCameraHorizontally(InputAction.CallbackContext context)
     {
         if (!context.performed)
             return;
+        var turnDirection = context.ReadValue<float>();
+        OnCameraTurn?.Invoke(turnDirection);
         
-        OnCameraTurnLeft?.Invoke();
+    }
+
+    public void OnPause(InputAction.CallbackContext context)
+    {
+        throw new NotImplementedException();
     }
 }

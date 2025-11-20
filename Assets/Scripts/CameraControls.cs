@@ -24,34 +24,22 @@ public class CameraControls : MonoBehaviour
 
     private void OnEnable()
     {
-        playerInput.OnCameraTurnRight += RotateRight;
-        playerInput.OnCameraTurnLeft += RotateLeft;
+        playerInput.OnCameraTurn += Rotate;
     }
     
     private void OnDisable()
     {
-        playerInput.OnCameraTurnRight -= RotateRight;
-        playerInput.OnCameraTurnLeft -= RotateLeft;
-    }
-    
-    [ContextMenu("RotateRight")]
-    private void RotateRight()
-    {
-        Rotate(-1);
+        playerInput.OnCameraTurn -= Rotate;
+
     }
 
-    [ContextMenu("RotateLeft")]
-    private void RotateLeft()
+    private void Rotate(float direction)
     {
-        Rotate(1);
-    }
-
-    private void Rotate(int direction)
-    {
+        int intDirection = (int)-direction;
         if (_rotationTween != null && _rotationTween.IsActive())
             return;
         
-        _currentRotationIndex = (_currentRotationIndex + direction) % _rotationEulers.Length;
+        _currentRotationIndex = (_currentRotationIndex + intDirection) % _rotationEulers.Length;
         if (_currentRotationIndex < 0)
             _currentRotationIndex += _rotationEulers.Length;
         
