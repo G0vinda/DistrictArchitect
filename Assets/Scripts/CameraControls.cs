@@ -8,11 +8,14 @@ public class CameraControls : MonoBehaviour
     [SerializeField] private PlayerInput playerInput;
     
     private Tween _rotationTween;
+    private Tween _heightAdjustmentTween;
     private Vector3[] _rotationEulers;
     private int _currentRotationIndex;
+    private float _startHeight;
 
     private void Start()
     {
+        _startHeight = transform.position.y;
         _rotationEulers = new[]
         {
             Vector3.zero,
@@ -30,7 +33,15 @@ public class CameraControls : MonoBehaviour
     private void OnDisable()
     {
         playerInput.OnCameraTurn -= Rotate;
+    }
 
+    public void SetNewHeight(float newHeight)
+    {
+        _heightAdjustmentTween?.Kill();
+        
+        var pos = transform.position;
+        pos.y = newHeight + _startHeight;
+        _heightAdjustmentTween = transform.DOMove(pos, 0.3f).SetEase(Ease.OutSine);
     }
 
     private void Rotate(float direction)

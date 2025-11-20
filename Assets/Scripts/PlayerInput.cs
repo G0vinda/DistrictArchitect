@@ -12,6 +12,7 @@ public class PlayerInput : ScriptableObject, Controls.IPlayerActions
     public Action<float> OnHorizontalTurn;
     public Action<float> OnVerticalTurn;
     public Action<float> OnCameraTurn;
+    public Action<float> OnFloorChanged;
     
     Controls controls;
     
@@ -68,7 +69,10 @@ public class PlayerInput : ScriptableObject, Controls.IPlayerActions
 
     public void OnChangeFloor(InputAction.CallbackContext context)
     {
-        throw new NotImplementedException();
+        if (!context.performed)
+            return;
+        
+        OnFloorChanged?.Invoke(-context.ReadValue<float>());
     }
 
     public void OnTurnCameraHorizontally(InputAction.CallbackContext context)

@@ -9,6 +9,7 @@ public class BuildingPlacement : MonoBehaviour
     [SerializeField] PlayerInput playerInput;
     [SerializeField] BuildingBlock blockPrefab;
     [SerializeField] TextMeshProUGUI debugHoverText;
+    [SerializeField] private CameraControls cameraControls;
     
     private Grid _grid;
     private Camera _cam;
@@ -16,6 +17,9 @@ public class BuildingPlacement : MonoBehaviour
     private List<Vector3Int> _rotatedBlockPositions;
     private Vector3Int? _lastHoveredGridCoordinates = null;
     private Vector3Int blockOffset = new Vector3Int(0, 0, 0);
+    private int _currentFloor;
+
+    public const float FLOOR_HEIGHT = 1f;
     
     private void Start()
     {
@@ -30,12 +34,14 @@ public class BuildingPlacement : MonoBehaviour
         playerInput.OnMouseClicked += TryPlaceBuilding;
         playerInput.OnVerticalTurn += TurnPreviewVertically;
         playerInput.OnHorizontalTurn += TurnPreviewHorizontally;
+        playerInput.OnFloorChanged += AdjustPlacementHeightToFloorChange;
     }
 
     private void OnDisable()
     {
         playerInput.OnMousePositionChanged -= CheckForEmptyBuildingSlot;
         playerInput.OnMouseClicked -= TryPlaceBuilding;
+        playerInput.OnFloorChanged -= AdjustPlacementHeightToFloorChange;
     }
 
     public void SelectBlock(BuildingBlock block)
@@ -49,32 +55,68 @@ public class BuildingPlacement : MonoBehaviour
         _rotatedBlockPositions = new List<Vector3Int>(blockPrefab.Positions);
     }
 
-    private void CheckForEmptyBuildingSlot(Vector2 mousePosition)
+    private void AdjustPlacementHeightToFloorChange(float floorChange)
+    {
+        var newFloor = (int)(_currentFloor + floorChange);
+        if (newFloor < 0)
+            return;
+        
+        _currentFloor = newFloor;
+        cameraControls.SetNewHeight(_currentFloor * FLOOR_HEIGHT);
+    }
+
+    private void CheckForEmptyBuildingSlotOnFloor(int floor, Vector2 mousePosition)
     {
         var mouseRay = _cam.ScreenPointToRay(mousePosition);
-        if (Physics.Raycast(mouseRay, out var hit))
+        if (!mouseRay.TryGetPositionY(floor * FLOOR_HEIGHT, out var hitCoordinates))
+            return;
+        
+        hitCoordinates += new Vector3(0, 0.1f, 0);
+        var gridCoordinates = Grid.WorldPositionToGridCoordinates(hitCoordinates);
+        if (_lastHoveredGridCoordinates != null && gridCoordinates == _lastHoveredGridCoordinates.Value)
+            return;
+        
+        debugHoverText.text = $"Hovering:{gridCoordinates}";
+        _lastHoveredGridCoordinates = gridCoordinates;
+        var hitArea = GetHitArea(gridCoordinates);
+        if (_grid.IsEmptyAtArea(hitArea))
         {
-            var hitGridCoordinates = Grid.WorldPositionToGridCoordinates(hit.point + 0.1f * hit.normal);
-            if (_lastHoveredGridCoordinates != null && hitGridCoordinates == _lastHoveredGridCoordinates.Value)
-                return;
-            
-            debugHoverText.text = $"Hovering:{hitGridCoordinates}";
-            _lastHoveredGridCoordinates = hitGridCoordinates;
-            var hitArea = GetHitArea(hitGridCoordinates);
-            if (_grid.IsEmptyAtArea(hitArea))
-            {
-                _blockPreview.transform.position = GetBlockPositionFromCoordinate(_lastHoveredGridCoordinates.Value);
-                _blockPreview.SetActive(true);
-                return;
-            }
+            _blockPreview.transform.position = GetBlockPositionFromCoordinate(_lastHoveredGridCoordinates.Value);
+            _blockPreview.SetActive(true);
+            return;
+        }
 
-            _lastHoveredGridCoordinates = null;
-        }
-        else
-        {
-            _lastHoveredGridCoordinates = null;
-        }
+        _lastHoveredGridCoordinates = null;
         _blockPreview.SetActive(false);
+    }
+
+    private void CheckForEmptyBuildingSlot(Vector2 mousePosition)
+    {
+        CheckForEmptyBuildingSlotOnFloor(_currentFloor, mousePosition);
+        // var mouseRay = _cam.ScreenPointToRay(mousePosition);
+        // if (Physics.Raycast(mouseRay, out var hit))
+        // {
+        //     var hitGridCoordinates = Grid.WorldPositionToGridCoordinates(hit.point + 0.1f * hit.normal);
+        //     if (_lastHoveredGridCoordinates != null && hitGridCoordinates == _lastHoveredGridCoordinates.Value)
+        //         return;
+        //     
+        //     debugHoverText.text = $"Hovering:{hitGridCoordinates}";
+        //     _lastHoveredGridCoordinates = hitGridCoordinates;
+        //     var hitArea = GetHitArea(hitGridCoordinates);
+        //     if (_grid.IsEmptyAtArea(hitArea))
+        //     {
+        //         _blockPreview.transform.position = GetBlockPositionFromCoordinate(_lastHoveredGridCoordinates.Value);
+        //         _blockPreview.SetActive(true);
+        //         return;
+        //     }
+        //
+        //     _lastHoveredGridCoordinates = null;
+        // }
+        // else
+        // {
+        //     _lastHoveredGridCoordinates = null;
+        // }
+        // _blockPreview.SetActive(false);
     }
 
     private List<Vector3Int> GetHitArea(Vector3Int gridCoordinates)
