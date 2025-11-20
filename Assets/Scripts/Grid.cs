@@ -35,6 +35,11 @@ public class Grid
     public void PlaceAtArea(IEnumerable<Vector3Int> area) => area.ForEach(coord => grid[coord] = true); 
     
     public void PlaceAt(Vector3Int coordinates) => grid[coordinates] = true;
+
+    public static bool IsCoordinateInGrid(Vector3Int coordinate)
+    {
+        return coordinate is { x: >= 0 and < MAP_SIZE, z: >= 0 and < MAP_SIZE };
+    }
     
     public static Vector3Int WorldPositionToGridCoordinates(Vector3 position)
     {

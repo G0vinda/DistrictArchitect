@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Sirenix.Serialization;
 using TMPro;
 using UnityEngine;
 
@@ -10,16 +9,19 @@ public class BuildingPlacement : MonoBehaviour
     [SerializeField] BuildingBlock blockPrefab;
     [SerializeField] TextMeshProUGUI debugHoverText;
     [SerializeField] private CameraControls cameraControls;
+    [SerializeField] private Color errorColor = Color.red;
     
     private Grid _grid;
     private Camera _cam;
     private GameObject _blockPreview;
     private List<Vector3Int> _rotatedBlockPositions;
-    private Vector3Int? _lastHoveredGridCoordinates = null;
-    private Vector3Int blockOffset = new Vector3Int(0, 0, 0);
     private int _currentFloor;
 
     public const float FLOOR_HEIGHT = 1f;
+    private Vector3Int? _lastHoveredGridCoordinates;
+    private bool _placeable;
+    private Color _baseColor;
+    private Vector3Int _blockOffset = new(0, 0, 0);
     
     private void Start()
     {
@@ -51,6 +53,7 @@ public class BuildingPlacement : MonoBehaviour
         
         blockPrefab = block;
         _blockPreview = Instantiate(block.PreviewPrefab);
+        _baseColor = _blockPreview.gameObject.GetComponentsInChildren<MeshRenderer>()[0].material.color;
         _blockPreview.SetActive(false);
         _rotatedBlockPositions = new List<Vector3Int>(blockPrefab.Positions);
     }
@@ -63,10 +66,15 @@ public class BuildingPlacement : MonoBehaviour
         
         _currentFloor = newFloor;
         cameraControls.SetNewHeight(_currentFloor * FLOOR_HEIGHT);
+        _lastHoveredGridCoordinates += Vector3Int.up * (int)floorChange;
+        UpdatePreview();
     }
 
     private void CheckForEmptyBuildingSlotOnFloor(int floor, Vector2 mousePosition)
     {
+        if(_blockPreview == null)
+            return;
+        
         var mouseRay = _cam.ScreenPointToRay(mousePosition);
         if (!mouseRay.TryGetPositionY(floor * FLOOR_HEIGHT, out var hitCoordinates))
             return;
@@ -75,58 +83,50 @@ public class BuildingPlacement : MonoBehaviour
         var gridCoordinates = Grid.WorldPositionToGridCoordinates(hitCoordinates);
         if (_lastHoveredGridCoordinates != null && gridCoordinates == _lastHoveredGridCoordinates.Value)
             return;
+
+        if (!Grid.IsCoordinateInGrid(gridCoordinates))
+        {
+            _lastHoveredGridCoordinates = null;
+            _placeable = false;
+            _blockPreview.SetActive(false);
+            return;
+        }
         
         debugHoverText.text = $"Hovering:{gridCoordinates}";
         _lastHoveredGridCoordinates = gridCoordinates;
-        var hitArea = GetHitArea(gridCoordinates);
-        if (_grid.IsEmptyAtArea(hitArea))
-        {
-            _blockPreview.transform.position = GetBlockPositionFromCoordinate(_lastHoveredGridCoordinates.Value);
-            _blockPreview.SetActive(true);
-            return;
-        }
+        UpdatePreview();
+    }
 
-        _lastHoveredGridCoordinates = null;
-        _blockPreview.SetActive(false);
+    private void UpdatePreview()
+    {
+        if (_lastHoveredGridCoordinates == null)
+            return;
+        
+        var hitArea = GetHitArea(_lastHoveredGridCoordinates.Value); 
+        _blockPreview.transform.position = GetBlockPositionFromCoordinate(_lastHoveredGridCoordinates.Value);
+        _blockPreview.SetActive(true);
+
+        _placeable = _grid.IsEmptyAtArea(hitArea);
+        
+        foreach (var meshRenderer in _blockPreview.gameObject.GetComponentsInChildren<MeshRenderer>())
+        {
+            meshRenderer.material.color = _placeable ? _baseColor : errorColor;
+        }
     }
 
     private void CheckForEmptyBuildingSlot(Vector2 mousePosition)
     {
         CheckForEmptyBuildingSlotOnFloor(_currentFloor, mousePosition);
-        // var mouseRay = _cam.ScreenPointToRay(mousePosition);
-        // if (Physics.Raycast(mouseRay, out var hit))
-        // {
-        //     var hitGridCoordinates = Grid.WorldPositionToGridCoordinates(hit.point + 0.1f * hit.normal);
-        //     if (_lastHoveredGridCoordinates != null && hitGridCoordinates == _lastHoveredGridCoordinates.Value)
-        //         return;
-        //     
-        //     debugHoverText.text = $"Hovering:{hitGridCoordinates}";
-        //     _lastHoveredGridCoordinates = hitGridCoordinates;
-        //     var hitArea = GetHitArea(hitGridCoordinates);
-        //     if (_grid.IsEmptyAtArea(hitArea))
-        //     {
-        //         _blockPreview.transform.position = GetBlockPositionFromCoordinate(_lastHoveredGridCoordinates.Value);
-        //         _blockPreview.SetActive(true);
-        //         return;
-        //     }
-        //
-        //     _lastHoveredGridCoordinates = null;
-        // }
-        // else
-        // {
-        //     _lastHoveredGridCoordinates = null;
-        // }
-        // _blockPreview.SetActive(false);
     }
 
     private List<Vector3Int> GetHitArea(Vector3Int gridCoordinates)
     {
-        return _rotatedBlockPositions.Select(pos => pos + gridCoordinates - blockOffset).ToList();
+        return _rotatedBlockPositions.Select(pos => pos + gridCoordinates - _blockOffset).ToList();
     }
 
     private void TryPlaceBuilding()
     {
-        if (_lastHoveredGridCoordinates == null) return;
+        if (!_placeable) return;
         
         var hitArea = GetHitArea(_lastHoveredGridCoordinates.Value).ToList();
         var newBlockPosition = GetBlockPositionFromCoordinate(_lastHoveredGridCoordinates.Value);
@@ -137,7 +137,7 @@ public class BuildingPlacement : MonoBehaviour
 
     private Vector3 GetBlockPositionFromCoordinate(Vector3Int coordinate)
     {
-        var newBlockPosition = Grid.GridCoordinatesToWorldPosition(coordinate) - blockOffset;
+        var newBlockPosition = Grid.GridCoordinatesToWorldPosition(coordinate) - _blockOffset;
         return newBlockPosition;
     }
 
@@ -151,6 +151,7 @@ public class BuildingPlacement : MonoBehaviour
         _blockPreview.transform.Rotate(Vector3.up, turnAngle, Space.World);
 
         RotateBlockPositions(turnDirection, Vector3Int.up);
+        UpdatePreview();
     }
 
     private void TurnPreviewVertically(float turnDirection)
@@ -168,18 +169,14 @@ public class BuildingPlacement : MonoBehaviour
         
         //FIX ROtation Directions be same
         RotateBlockPositions(turnDirection, axis);
+        UpdatePreview();
     }
 
     private void RotateBlockPositions(float turnDirection, Vector3Int axis)
     {
         _rotatedBlockPositions = _rotatedBlockPositions.ConvertAll(pos => pos.Rotate(axis, Mathf.RoundToInt(turnDirection)));
-        blockOffset = _rotatedBlockPositions.Aggregate(Vector3Int.zero, (acc, v) => v.y < acc.y ? v : acc);
-        if (blockOffset.y >= 0)
-        {
-            blockOffset = Vector3Int.zero;
-        }
-        
-        if(_lastHoveredGridCoordinates != null)
-            _blockPreview.transform.position = GetBlockPositionFromCoordinate(_lastHoveredGridCoordinates.Value);
+        _blockOffset = _rotatedBlockPositions.Aggregate(Vector3Int.zero, (acc, v) => v.y < acc.y ? v : acc);
+        if (_blockOffset.y >= 0)
+            _blockOffset = Vector3Int.zero;
     }
 }
