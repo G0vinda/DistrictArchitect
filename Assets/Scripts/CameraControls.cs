@@ -6,6 +6,8 @@ using UnityEngine.InputSystem.Composites;
 public class CameraControls : MonoBehaviour
 {
     [SerializeField] private PlayerInput playerInput;
+
+    public Vector3 CurrentRotationEulers => _rotationEulers[_currentRotationIndex];
     
     private Tween _rotationTween;
     private Tween _heightAdjustmentTween;
@@ -23,6 +25,7 @@ public class CameraControls : MonoBehaviour
             new Vector3(0, -180, 0),
             new Vector3(0, -90, 0),
         };
+        
     }
 
     private void OnEnable()
@@ -55,5 +58,6 @@ public class CameraControls : MonoBehaviour
             _currentRotationIndex += _rotationEulers.Length;
         
         _rotationTween = transform.DORotate(_rotationEulers[_currentRotationIndex], 0.7f).SetEase(Ease.InSine);
+        Debug.Log($"CamRotation now set to {CurrentRotationEulers}");
     }
 }

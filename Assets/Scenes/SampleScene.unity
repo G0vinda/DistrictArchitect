@@ -1103,7 +1103,6 @@ GameObject:
   - component: {fileID: 1233451836}
   - component: {fileID: 1233451835}
   - component: {fileID: 1233451834}
-  - component: {fileID: 1233451838}
   m_Layer: 0
   m_Name: BuildGround
   m_TagString: Untagged
@@ -1201,18 +1200,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1233451838
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1233451833}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e2ee5892bd4cfc54eacf8bb1ec1cd425, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &2067620723
 GameObject:
   m_ObjectHideFlags: 0
@@ -1242,6 +1229,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 809bcdc9b64740ff82f84e57fd7547cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  camControls: {fileID: 1088046477}
   playerInput: {fileID: 11400000, guid: 692e78c876cbd3649aea4fa9ed7f80a7, type: 2}
   blockPrefab: {fileID: 6954337490481676280, guid: 6a946a1d567394e4c91035ed0329d58a, type: 3}
   debugHoverText: {fileID: 1178236361}

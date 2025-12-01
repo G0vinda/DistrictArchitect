@@ -18,11 +18,18 @@ public static class Vector3IntExtension
         nRightTurns %= 4;
         var cos = Mathf.RoundToInt(Mathf.Cos(nRightTurns * Mathf.PI / 2));
         var sin = Mathf.RoundToInt(Mathf.Sin(nRightTurns * Mathf.PI / 2));
-
+        
         if (unitAxis == Vector3Int.right)
         {
             var newY = v.y * cos - v.z * sin;
             var newZ = v.y * sin + v.z * cos;
+            return new Vector3Int(v.x, newY, newZ);
+        }
+        
+        if (unitAxis == Vector3Int.left)
+        {
+            var newY = -v.y * cos + v.z * sin;
+            var newZ = -v.y * sin - v.z * cos;
             return new Vector3Int(v.x, newY, newZ);
         }
 
@@ -32,6 +39,13 @@ public static class Vector3IntExtension
             var newZ = v.z * cos - v.x * sin;
             return new Vector3Int(newX, v.y, newZ);
         }
+        
+        if (unitAxis == Vector3Int.down)
+        {
+            var newX = -v.x * cos - v.z * sin;
+            var newZ = -v.z * cos + v.x * sin;
+            return new Vector3Int(newX, v.y, newZ);
+        }
 
         if (unitAxis == Vector3Int.forward)
         {
@@ -39,7 +53,14 @@ public static class Vector3IntExtension
             var newY = v.x * sin + v.y * cos;
             return new Vector3Int(newX, newY, v.z);
         }
+        
+        if (unitAxis == Vector3Int.back)
+        {
+            var newX = -v.x * cos + v.y * sin;
+            var newY = -v.x * sin - v.y * cos;
+            return new Vector3Int(newX, newY, v.z);
+        }
 
-        throw new ArgumentException("UnitAxis must be either UnitX, UnitY, UnitZ!");
+        throw new ArgumentException($"{v} is not an unit axis vector!");
     }
 }

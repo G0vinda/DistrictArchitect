@@ -4,7 +4,7 @@ using UnityEngine;
 public static class RayExtensions
 {
 
-    public static bool TryGetPositionY(this Ray ray, float yValue, out Vector3 point)
+    public static bool TryGetPositionAtY(this Ray ray, float yValue, out Vector3 point)
     {
         point = Vector3.zero;
         if (ray.origin.y > yValue && ray.direction.y > 0 || ray.origin.y < yValue && ray.direction.y < 0)
