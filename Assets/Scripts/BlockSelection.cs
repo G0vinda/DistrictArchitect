@@ -5,6 +5,7 @@ public class BlockSelection : MonoBehaviour
     [SerializeField] private BlockSelectionField[] selectionFields;
     [SerializeField] private ShapeManager shapeManager;
     [SerializeField] private BuildingPlacement buildingPlacement;
+    [SerializeField] private CellClusterSelector cellClusterSelector;
     [SerializeField] private PlayerInput playerInput;
     
     private BlockSelectionField _selectedField;
@@ -51,6 +52,7 @@ public class BlockSelection : MonoBehaviour
             _selectedField.SetHighlight(false);
         selectionField.SetHighlight(true);
         buildingPlacement.SelectBlockShape(selectionField.ShapeDefinition);
+        cellClusterSelector.ResetHighlighting();
         _selectedField = selectionField;
     }
     

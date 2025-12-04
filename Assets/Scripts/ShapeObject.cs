@@ -15,6 +15,7 @@ public class ShapeObject : MonoBehaviour
     public void SetMaterialAlpha(float newAlpha) => Cells.ForEach(c => c.SetAlpha(newAlpha)); 
     public void SetMaterialWhiteBlend(float newWhiteBlend) => Cells.ForEach(c => c.SetWhiteBlend(newWhiteBlend));
     public void EnableColliders() => Cells.ForEach(c => c.Collider.enabled = true);
+    public void SetMaterialToDisabled(bool disabled) => Cells.ForEach(c => c.SetDisabled(disabled));
 
     public void Rotate90(Vector3Int axis, int turnDirection)
     {
@@ -42,6 +43,7 @@ public class ShapeObject : MonoBehaviour
         if (_rotationRoutine != null)
             StopCoroutine(_rotationRoutine);
         transform.rotation = _desiredRotation;
+        gameObject.SetActive(false);
     }
 
     public void Show()

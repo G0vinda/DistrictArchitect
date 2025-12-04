@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
@@ -16,13 +15,13 @@ public class BuildingPlacement : MonoBehaviour
     [SerializeField] private CameraControls cameraControls;
     [SerializeField] private Material buildingPreviewMaterial;
     [SerializeField] private Material buildingPreviewDisabledMaterial;
-    [SerializeField] private float previewMaterialAlpha = 0.7f;
+    [SerializeField] private float previewMaterialAlpha = 0.6f;
     
-    public const float FLOOR_HEIGHT = 1f;
-
+    public bool IsPlacing => _currentShapeObject != null;
+    public Grid Grid { get; private set; }
+    
     public Action PlacedBuilding;
     
-    private Grid _grid;
     private Camera _cam;
     private int _currentFloor;
     private Vector3Int? _lastHoveredGridCoordinates;
@@ -30,9 +29,11 @@ public class BuildingPlacement : MonoBehaviour
     private int _blockYAdjustment;
     private ShapeObject _currentShapeObject;
     
+    private const float FLOOR_HEIGHT = 1f;
+    
     private void Start()
     {
-        _grid = new Grid();
+        Grid = new Grid();
         _cam = Camera.main;
     }
 
@@ -61,6 +62,7 @@ public class BuildingPlacement : MonoBehaviour
         
         _currentShapeObject = ShapeObjectGenerator.Instance.Generate(cellDataByPositions);
         _currentShapeObject.SetMaterialAlpha(previewMaterialAlpha);
+        _currentShapeObject.Hide();
     }
 
     public void Unselect()
@@ -130,8 +132,8 @@ public class BuildingPlacement : MonoBehaviour
         _currentShapeObject.transform.position = GetBlockPositionFromCoordinate(_lastHoveredGridCoordinates.Value + Vector3Int.up * _blockYAdjustment);
         _currentShapeObject.Show();
 
-        _placeable = _grid.CanShapeBePlacedAtArea(hitArea);
-        // Todo: change material to enabled/disabled based on placeable
+        _placeable = Grid.CanShapeBePlacedAtArea(hitArea);
+        _currentShapeObject.SetMaterialToDisabled(!_placeable);
     }
 
     private void CheckForEmptyBuildingSlot(Vector2 mousePosition)
@@ -152,7 +154,7 @@ public class BuildingPlacement : MonoBehaviour
         var finalShapeCoordinates = _lastHoveredGridCoordinates.Value + Vector3Int.up * _blockYAdjustment;
         var finalShapePosition = GetBlockPositionFromCoordinate(finalShapeCoordinates);
         _currentShapeObject.transform.position = finalShapePosition;
-        _grid.PlaceShapeAtPosition(_currentShapeObject, finalShapeCoordinates);
+        Grid.PlaceShapeAtPosition(_currentShapeObject, finalShapeCoordinates);
         _currentShapeObject.SetMaterialAlpha(1.0f);
         _currentShapeObject.EnableColliders();
         PlayPlacementAnimation();

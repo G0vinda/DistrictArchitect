@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Rendering;
 
 public class CellObject : MonoBehaviour
 {
@@ -7,6 +8,7 @@ public class CellObject : MonoBehaviour
     
     private static readonly int ALPHA = Shader.PropertyToID("_Alpha");
     private static readonly int WHITE_BLEND = Shader.PropertyToID("_WhiteBlend");
+    private static readonly int DISABLED = Shader.PropertyToID("_Disabled");
 
     public CellData CellData
     {
@@ -28,5 +30,15 @@ public class CellObject : MonoBehaviour
     public void SetWhiteBlend(float whiteBlend)
     {
         meshRenderer.material.SetFloat(WHITE_BLEND, whiteBlend);
+    }
+
+    public void SetDisabled(bool disabled)
+    {
+        meshRenderer.material.SetFloat(DISABLED, disabled ? 1 : 0);
+    }
+
+    public void SetCastShadows(bool castShadows)
+    {
+        meshRenderer.shadowCastingMode = castShadows ? ShadowCastingMode.On : ShadowCastingMode.Off;
     }
 }

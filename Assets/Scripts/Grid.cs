@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using Sirenix.Utilities;
 using UnityEngine;
 
 public class Grid
@@ -28,13 +27,13 @@ public class Grid
     public bool CanShapeBePlacedAtArea(IEnumerable<Vector3Int> area)
     {
         var isEmpty = area.All(coord => grid.ContainsKey(coord) && grid[coord] == null);
-        var hasGround = area.Any(coord => coord.y == 0 || grid.ContainsKey(coord + Vector3Int.down) && grid[coord + Vector3Int.down] == null);
+        var hasGround = area.Any(coord => coord.y == 0 || grid.ContainsKey(coord + Vector3Int.down) && grid[coord + Vector3Int.down] != null);
         return isEmpty && hasGround;
     }
 
     public static bool IsCoordinateInGrid(Vector3Int coordinate)
     {
-        return coordinate is { x: >= 0 and < MAP_SIZE, z: >= 0 and < MAP_SIZE };
+        return coordinate is { x: >= 0 and < MAP_SIZE, y: >= 0 and < MAP_SIZE, z: >= 0 and < MAP_SIZE };
     }
     
     public static Vector3Int WorldPositionToGridCoordinates(Vector3 position)
@@ -59,5 +58,47 @@ public class Grid
         {
             grid[localCoordinate + position] = cell;
         }
+    }
+
+    public List<CellObject> GetAllCellObjects()
+    {
+        return grid.Values.Where(cell => cell != null).ToList();
+    }
+
+    public CellObject GetCellObjectAtCoordinates(Vector3Int coordinates)
+    {
+        return grid[coordinates];
+    }
+
+    public List<Vector3Int> FindCellCluster(Vector3Int startCoordinate)
+    {
+        var openCoordinates = new Queue<Vector3Int>();
+        openCoordinates.Enqueue(startCoordinate);
+        var closedCoordinates = new HashSet<Vector3Int>() {startCoordinate};
+        var clusterCoordinates = new List<Vector3Int>() {startCoordinate};
+        var directions = new[]
+            { Vector3Int.up, Vector3Int.down, Vector3Int.right, Vector3Int.left, Vector3Int.forward, Vector3Int.back };
+        var clusterData = grid[startCoordinate].CellData;
+
+        while (openCoordinates.Count > 0)
+        {
+            var current = openCoordinates.Dequeue();
+            foreach (var dir in directions)
+            {
+                var neighbor = current + dir;
+                if (!closedCoordinates.Add(neighbor))
+                    continue;
+
+                if (!IsCoordinateInGrid(neighbor))
+                    continue;
+                
+                if (grid[neighbor] == null || grid[neighbor].CellData != clusterData)
+                    continue;
+                
+                clusterCoordinates.Add(neighbor);
+                openCoordinates.Enqueue(neighbor);
+            }
+        }
+        return clusterCoordinates;
     }
 }
