@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class Grid
 {
-    private Dictionary<Vector3Int, bool> grid = new();
+    private Dictionary<Vector3Int, CellObject> grid = new();
 
     public const int MAP_SIZE = 6;
     public const float CELL_SIZE = 1f;
@@ -19,22 +19,18 @@ public class Grid
             {
                 for (var z = 0; z < MAP_SIZE; z++)
                 {
-                    grid.Add(new Vector3Int(x, y, z), false);
+                    grid.Add(new Vector3Int(x, y, z), null);
                 }   
             }
         }
     }
 
-    public bool IsEmptyAtArea(IEnumerable<Vector3Int> area)
+    public bool CanShapeBePlacedAtArea(IEnumerable<Vector3Int> area)
     {
-        return area.All(coord => grid.ContainsKey(coord) && !grid[coord]);
+        var isEmpty = area.All(coord => grid.ContainsKey(coord) && grid[coord] == null);
+        var hasGround = area.Any(coord => coord.y == 0 || grid.ContainsKey(coord + Vector3Int.down) && grid[coord + Vector3Int.down] == null);
+        return isEmpty && hasGround;
     }
-    
-    public bool IsEmptyAt(Vector3Int coordinates) => !grid[coordinates];
-    
-    public void PlaceAtArea(IEnumerable<Vector3Int> area) => area.ForEach(coord => grid[coord] = true); 
-    
-    public void PlaceAt(Vector3Int coordinates) => grid[coordinates] = true;
 
     public static bool IsCoordinateInGrid(Vector3Int coordinate)
     {
@@ -55,5 +51,13 @@ public class Grid
             coordinates.x * CELL_SIZE + BLOCK_OFFSET,
             coordinates.y * CELL_SIZE + BLOCK_OFFSET,
             coordinates.z * CELL_SIZE + BLOCK_OFFSET);
+    }
+
+    public void PlaceShapeAtPosition(ShapeObject shape, Vector3Int position)
+    {
+        foreach (var (localCoordinate, cell) in shape.CellsByCoordinate)
+        {
+            grid[localCoordinate + position] = cell;
+        }
     }
 }

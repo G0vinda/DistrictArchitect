@@ -13,7 +13,7 @@ public static class Vector3IntExtension
         return a.x * b.x + a.y * b.y + a.z * b.z;
     }
         
-    public static Vector3Int Rotate(this Vector3Int v, Vector3Int unitAxis, int nRightTurns)
+    public static Vector3Int Rotate90(this Vector3Int v, Vector3Int unitAxis, int nRightTurns)
     {
         nRightTurns %= 4;
         var cos = Mathf.RoundToInt(Mathf.Cos(nRightTurns * Mathf.PI / 2));

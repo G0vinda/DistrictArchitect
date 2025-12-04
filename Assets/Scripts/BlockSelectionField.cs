@@ -10,14 +10,12 @@ public class BlockSelectionField : MonoBehaviour, IPointerClickHandler
     [SerializeField] private BlockSelectionRenderSet renderSet;
     [SerializeField] private UnityEvent<BlockSelectionField> onBlockSelected;
     
-    public List<Vector3Int> BlockPositions { get; private set; }
-    public Material BlockMaterial { get; private set; }
+    public Dictionary<Vector3Int, CellData> ShapeDefinition { get; private set; }
 
-    public void SetBlockShape(List<Vector3Int> blockPositions, Material blockMaterial)
+    public void SetShapeDefinition(Dictionary<Vector3Int, CellData> shapeDefinition)
     {
-        BlockPositions = blockPositions;
-        BlockMaterial = blockMaterial;
-        renderSet.SetShape(BlockPositions, BlockMaterial);
+        ShapeDefinition = shapeDefinition;
+        renderSet.SetShape(ShapeDefinition);
     }
 
     public void SetHighlight(bool highlight)

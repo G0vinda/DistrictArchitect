@@ -1,6 +1,4 @@
-﻿using System;
-using UnityEngine;
-using Random = UnityEngine.Random;
+﻿using UnityEngine;
 
 public class BlockSelection : MonoBehaviour
 {
@@ -8,7 +6,6 @@ public class BlockSelection : MonoBehaviour
     [SerializeField] private ShapeManager shapeManager;
     [SerializeField] private BuildingPlacement buildingPlacement;
     [SerializeField] private PlayerInput playerInput;
-    [SerializeField] private Material[] blockMaterials;
     
     private BlockSelectionField _selectedField;
 
@@ -28,12 +25,15 @@ public class BlockSelection : MonoBehaviour
     {
         foreach (var blockSelectionField in selectionFields)
         {
-            blockSelectionField.SetBlockShape(shapeManager.GetRandomShape(), blockMaterials[Random.Range(0, blockMaterials.Length)]);
+            blockSelectionField.SetShapeDefinition(shapeManager.GetRandomShapeDefinition());
         }
     }
     
     private void CancelSelection()
     {
+        if (!_selectedField)
+            return;
+        
         _selectedField.SetHighlight(false);
         buildingPlacement.Unselect();
         _selectedField = null;
@@ -50,13 +50,13 @@ public class BlockSelection : MonoBehaviour
         if (_selectedField != null)
             _selectedField.SetHighlight(false);
         selectionField.SetHighlight(true);
-        buildingPlacement.SelectBlockShape(selectionField.BlockPositions, selectionField.BlockMaterial);
+        buildingPlacement.SelectBlockShape(selectionField.ShapeDefinition);
         _selectedField = selectionField;
     }
     
     private void OnBuildingPlaced()
     {
-        _selectedField.SetBlockShape(shapeManager.GetRandomShape(), blockMaterials[Random.Range(0, blockMaterials.Length)]);
+        _selectedField.SetShapeDefinition(shapeManager.GetRandomShapeDefinition());
         CancelSelection();
     }
 }

@@ -7,9 +7,9 @@ public class BlockSelectionRenderSet : MonoBehaviour
     [SerializeField] private Camera cam;
     [SerializeField] private RenderTexture renderTexture;
     [SerializeField] private RawImage renderTarget;
-    [SerializeField] private MeshFilter renderObject;
-    
-    public Mesh Mesh { get; private set; }
+    [SerializeField] private Transform renderObjectParent;
+
+    private ShapeObject shapeObject;
     
     void Start()
     {
@@ -18,10 +18,13 @@ public class BlockSelectionRenderSet : MonoBehaviour
         cam.gameObject.SetActive(true);
     }
 
-    public void SetShape(List<Vector3Int> blockPositions, Material material)
+    public void SetShape(Dictionary<Vector3Int, CellData> shapeDefinition)
     {
-        Mesh = BlockMeshGenerator.GenerateCenteredMesh(blockPositions);
-        renderObject.mesh = Mesh;
-        renderObject.GetComponent<MeshRenderer>().material = material;
+        if (shapeObject != null)
+            Destroy(shapeObject.gameObject);
+        
+        shapeObject = ShapeObjectGenerator.Instance.GenerateCentered(shapeDefinition);
+        shapeObject.transform.SetParent(renderObjectParent);
+        shapeObject.transform.position = renderObjectParent.position;
     }
 }

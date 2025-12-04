@@ -936,6 +936,7 @@ GameObject:
   m_Component:
   - component: {fileID: 787697910}
   - component: {fileID: 787697909}
+  - component: {fileID: 787697911}
   m_Layer: 0
   m_Name: ShapeManager
   m_TagString: Untagged
@@ -955,6 +956,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ea41f51d4c542ecade76569406bee53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cellData:
+  - {fileID: 11400000, guid: 3f8d0dbef5e99614ba6258e901ac05ab, type: 2}
+  - {fileID: 11400000, guid: 233fea00fdbfbba458c3560e4d4310a4, type: 2}
+  - {fileID: 11400000, guid: 6a81a3cf557f61848b48e312c04089c2, type: 2}
+  - {fileID: 11400000, guid: 1e4fbe217c8257847a210a8ba9df4a54, type: 2}
 --- !u!4 &787697910
 Transform:
   m_ObjectHideFlags: 0
@@ -970,6 +976,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &787697911
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 787697908}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec51530391a845aeb6c5120600247419, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cellObjectPrefab: {fileID: 2721046774980866411, guid: 141f90602e615e4478cba362096d2b92, type: 3}
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -1715,6 +1734,7 @@ MonoBehaviour:
   cameraControls: {fileID: 1088046477}
   buildingPreviewMaterial: {fileID: 2100000, guid: c5c0b2281799a694686a8e230be46256, type: 2}
   buildingPreviewDisabledMaterial: {fileID: 2100000, guid: 9aa3a9b17bb3f704391e3205932525c7, type: 2}
+  previewMaterialAlpha: 0.7
 --- !u!4 &2067620725
 Transform:
   m_ObjectHideFlags: 0

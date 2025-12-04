@@ -1,9 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class ShapeManager : MonoBehaviour
 {
     private List<List<Vector3Int>> _shapes = new();
+
+    [SerializeField] private CellData[] cellData;
     
     private void Awake()
     {
@@ -25,8 +28,29 @@ public class ShapeManager : MonoBehaviour
         _shapes.Add(tripodShape);
     }
 
-    public List<Vector3Int> GetRandomShape()
+    public Dictionary<Vector3Int, CellData> GetRandomShapeDefinition()
     {
-        return new List<Vector3Int>(_shapes[Random.Range(0, _shapes.Count)]);
+        var cellDataList = cellData.ToList();
+        var cellData1 = cellDataList[Random.Range(0, cellDataList.Count)];
+        cellDataList.Remove(cellData1);
+        var cellData2 = cellDataList[Random.Range(0, cellDataList.Count)];
+        var cellCoordinates = new List<Vector3Int>(_shapes[Random.Range(0, _shapes.Count)]);
+        
+        var cellDataByCoordinates = new Dictionary<Vector3Int, CellData>();
+        var coords = cellCoordinates[Random.Range(0, cellCoordinates.Count)];
+        cellCoordinates.Remove(coords);
+        cellDataByCoordinates.Add(coords, cellData1);
+        coords = cellCoordinates[Random.Range(0, cellCoordinates.Count)];
+        cellCoordinates.Remove(coords);
+        cellDataByCoordinates.Add(coords, cellData2);
+
+        while (cellCoordinates.Count > 0)
+        {
+            coords = cellCoordinates[Random.Range(0, cellCoordinates.Count)];
+            cellCoordinates.Remove(coords);
+            cellDataByCoordinates.Add(coords, Random.Range(0, 2) == 0 ? cellData1 : cellData2);
+        }
+
+        return cellDataByCoordinates;
     }
 }
