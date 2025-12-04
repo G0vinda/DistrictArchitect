@@ -13,6 +13,7 @@ public class PlayerInput : ScriptableObject, Controls.IPlayerActions
     public Action<float> OnVerticalTurn;
     public Action<float> OnCameraTurn;
     public Action<float> OnFloorChanged;
+    public Action OnRightClicked;
     
     Controls controls;
     
@@ -87,5 +88,13 @@ public class PlayerInput : ScriptableObject, Controls.IPlayerActions
     public void OnPause(InputAction.CallbackContext context)
     {
         throw new NotImplementedException();
+    }
+
+    public void OnRighClick(InputAction.CallbackContext context)
+    {
+        if (!context.performed)
+            return;
+        
+        OnRightClicked?.Invoke();
     }
 }

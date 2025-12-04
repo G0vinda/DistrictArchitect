@@ -153,6 +153,15 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""RighClick"",
+                    ""type"": ""Button"",
+                    ""id"": ""ee15ee69-1e1b-4d41-a20b-608ee3acdb26"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -320,6 +329,17 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""action"": ""Pause"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d660d0a7-605f-40b5-a356-324ef0292f3b"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RighClick"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -335,6 +355,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         m_Player_ChangeFloor = m_Player.FindAction("Change Floor", throwIfNotFound: true);
         m_Player_TurnCameraHorizontally = m_Player.FindAction("Turn Camera Horizontally", throwIfNotFound: true);
         m_Player_Pause = m_Player.FindAction("Pause", throwIfNotFound: true);
+        m_Player_RighClick = m_Player.FindAction("RighClick", throwIfNotFound: true);
     }
 
     ~@Controls()
@@ -422,6 +443,7 @@ public partial class @Controls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_ChangeFloor;
     private readonly InputAction m_Player_TurnCameraHorizontally;
     private readonly InputAction m_Player_Pause;
+    private readonly InputAction m_Player_RighClick;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -461,6 +483,10 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/Pause".
         /// </summary>
         public InputAction @Pause => m_Wrapper.m_Player_Pause;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/RighClick".
+        /// </summary>
+        public InputAction @RighClick => m_Wrapper.m_Player_RighClick;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -508,6 +534,9 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @Pause.started += instance.OnPause;
             @Pause.performed += instance.OnPause;
             @Pause.canceled += instance.OnPause;
+            @RighClick.started += instance.OnRighClick;
+            @RighClick.performed += instance.OnRighClick;
+            @RighClick.canceled += instance.OnRighClick;
         }
 
         /// <summary>
@@ -540,6 +569,9 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @Pause.started -= instance.OnPause;
             @Pause.performed -= instance.OnPause;
             @Pause.canceled -= instance.OnPause;
+            @RighClick.started -= instance.OnRighClick;
+            @RighClick.performed -= instance.OnRighClick;
+            @RighClick.canceled -= instance.OnRighClick;
         }
 
         /// <summary>
@@ -629,5 +661,12 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnPause(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "RighClick" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnRighClick(InputAction.CallbackContext context);
     }
 }

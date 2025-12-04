@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
@@ -9,12 +10,16 @@ public class BuildingPlacement : MonoBehaviour
 {
     [SerializeField] CameraControls camControls;
     [SerializeField] PlayerInput playerInput;
-    [SerializeField] BuildingBlock blockPrefab;
+    [SerializeField] GameObject buildingBlockPrefab;
+    [SerializeField] GameObject buildingBlockPreviewPrefab;
     [SerializeField] TextMeshProUGUI debugHoverText;
     [SerializeField] private CameraControls cameraControls;
-    [SerializeField] private Color errorColor = Color.red;
+    [SerializeField] private Material buildingPreviewMaterial;
+    [SerializeField] private Material buildingPreviewDisabledMaterial;
     
     public const float FLOOR_HEIGHT = 1f;
+
+    public Action PlacedBuilding;
     
     private Grid _grid;
     private Camera _cam;
@@ -23,16 +28,17 @@ public class BuildingPlacement : MonoBehaviour
     private int _currentFloor;
     private Vector3Int? _lastHoveredGridCoordinates;
     private bool _placeable;
-    private Color _baseColor;
     private int _blockYAdjustment;
     private Quaternion _desiredPreviewRotation;
     private Coroutine _previewRotationCoroutine;
+    
+    private List<Vector3Int> _currentBlockPositions;
+    private Material _currentBlockMaterial;
     
     private void Start()
     {
         _grid = new Grid();
         _cam = Camera.main;
-        SelectBlock(blockPrefab);
     }
 
     private void OnEnable()
@@ -51,24 +57,32 @@ public class BuildingPlacement : MonoBehaviour
         playerInput.OnFloorChanged -= AdjustPlacementHeightToFloorChange;
     }
 
-    public void SelectBlock(BuildingBlock block)
+    public void SelectBlockShape(List<Vector3Int> blockPositions, Material blockMaterial)
     {
+        _blockYAdjustment = 0;
+        _desiredPreviewRotation = Quaternion.identity;
+        _rotatedBlockPositions = new List<Vector3Int>(blockPositions);
+        
         if (_blockPreview != null)
             Destroy(_blockPreview);
         
-        blockPrefab = block;
-        _blockPreview = Instantiate(block.PreviewPrefab);
-        _baseColor = _blockPreview.gameObject.GetComponentsInChildren<MeshRenderer>()[0].material.color;
-        _blockPreview.SetActive(false);
-        _blockYAdjustment = 0;
-        _desiredPreviewRotation = Quaternion.identity;
-        _rotatedBlockPositions = new List<Vector3Int>(blockPrefab.Positions);
+        _blockPreview = Instantiate(buildingBlockPreviewPrefab);
+        _blockPreview.gameObject.SetActive(false);
+        _blockPreview.GetComponent<MeshFilter>().mesh = BlockMeshGenerator.Generate(blockPositions);
+        _currentBlockPositions = blockPositions;
+        _currentBlockMaterial = blockMaterial;
+    }
+
+    public void Unselect()
+    {
+        Destroy(_blockPreview);
+        _currentBlockPositions = null;
     }
 
     private void AdjustPlacementHeightToFloorChange(float floorChange)
     {
         var newFloor = (int)(_currentFloor + floorChange);
-        if (newFloor < 0)
+        if (newFloor < 0 || newFloor >= Grid.MAP_SIZE)
             return;
         
         _currentFloor = newFloor;
@@ -81,9 +95,21 @@ public class BuildingPlacement : MonoBehaviour
     {
         if(_blockPreview == null)
             return;
-        
+
+        var floorY = floor * FLOOR_HEIGHT;
         var mouseRay = _cam.ScreenPointToRay(mousePosition);
-        if (!mouseRay.TryGetPositionAtY(floor * FLOOR_HEIGHT, out var hitCoordinates))
+        // if (Physics.Raycast(mouseRay, out RaycastHit hit) && 
+        //     hit.point.y > floorY + float.Epsilon && 
+        //     hit.point.y < floorY + FLOOR_HEIGHT)
+        // {
+        //     
+        // }
+        // else
+        // {
+        //     
+        // }
+        
+        if (!mouseRay.TryGetPositionAtY(floorY, out var hitCoordinates))
             return;
         
         hitCoordinates += new Vector3(0, 0.1f, 0);
@@ -95,8 +121,10 @@ public class BuildingPlacement : MonoBehaviour
         {
             _lastHoveredGridCoordinates = null;
             _placeable = false;
+            if (_previewRotationCoroutine != null)
+                StopCoroutine(_previewRotationCoroutine);
             _blockPreview.SetActive(false);
-            _desiredPreviewRotation = Quaternion.identity;
+            _blockPreview.transform.rotation = _desiredPreviewRotation;
             return;
         }
         
@@ -107,19 +135,15 @@ public class BuildingPlacement : MonoBehaviour
 
     private void UpdatePreview()
     {
-        if (_lastHoveredGridCoordinates == null)
+        if (_lastHoveredGridCoordinates == null || _blockPreview == null)
             return;
         
         var hitArea = GetHitArea(_lastHoveredGridCoordinates.Value); 
-        _blockPreview.transform.position = GetBlockPositionFromCoordinate(_lastHoveredGridCoordinates.Value);
+        _blockPreview.transform.position = GetBlockPositionFromCoordinate(_lastHoveredGridCoordinates.Value + Vector3Int.up * _blockYAdjustment);
         _blockPreview.SetActive(true);
 
         _placeable = _grid.IsEmptyAtArea(hitArea);
-        
-        foreach (var meshRenderer in _blockPreview.gameObject.GetComponentsInChildren<MeshRenderer>())
-        {
-            meshRenderer.material.color = _placeable ? _baseColor : errorColor;
-        }
+        _blockPreview.GetComponent<MeshRenderer>().material = _placeable ? buildingPreviewMaterial : buildingPreviewDisabledMaterial;
     }
 
     private void CheckForEmptyBuildingSlot(Vector2 mousePosition)
@@ -134,28 +158,46 @@ public class BuildingPlacement : MonoBehaviour
 
     private void TryPlaceBuilding()
     {
-        if (!_placeable) return;
+        if (!_placeable || _blockPreview == null) return;
+        
+        if (_previewRotationCoroutine != null)
+            StopCoroutine(_previewRotationCoroutine);
         
         var hitArea = GetHitArea(_lastHoveredGridCoordinates.Value).ToList();
-        var newBlockPosition = GetBlockPositionFromCoordinate(_lastHoveredGridCoordinates.Value);
-        var newBuildingBlock = Instantiate(blockPrefab, newBlockPosition, _blockPreview.transform.rotation);
+        var newBlockPosition = GetBlockPositionFromCoordinate(_lastHoveredGridCoordinates.Value + Vector3Int.up * _blockYAdjustment);
+        var newBuildingBlock = Instantiate(buildingBlockPrefab, newBlockPosition, _blockPreview.transform.rotation);
+        var mesh = BlockMeshGenerator.Generate(_currentBlockPositions);
+        newBuildingBlock.GetComponent<MeshFilter>().mesh = mesh;
+        newBuildingBlock.GetComponent<MeshCollider>().sharedMesh = mesh;
+        newBuildingBlock.GetComponent<MeshRenderer>().material = _currentBlockMaterial;
         _grid.PlaceAtArea(hitArea);
-        SelectBlock(blockPrefab);
+        Unselect();
         
+        PlayPlacementAnimation(newBuildingBlock);
+        PlacedBuilding?.Invoke();
+    }
+
+    private void PlayPlacementAnimation(GameObject placedBlock)
+    {
         var placementAnimation = DOTween.Sequence();
-        placementAnimation.Append(newBuildingBlock.transform.DOScale(Vector3.one * 1.15f, 0.05f));
-        placementAnimation.Append(newBuildingBlock.transform.DOScale(Vector3.one * 1f, 0.15f).SetEase(Ease.OutSine));
+        var whiteBlendId = Shader.PropertyToID("_WhiteBlend");
+        var material = placedBlock.GetComponent<MeshRenderer>().material;
+        material.SetFloat(whiteBlendId, 0.6f);
+        placementAnimation.Append(placedBlock.transform.DOScale(Vector3.one * 1.15f, 0.05f));
+        placementAnimation.Append(placedBlock.transform.DOScale(Vector3.one * 1f, 0.15f).SetEase(Ease.OutSine));
+        placementAnimation.Join(DOVirtual.Float(0.6f, 0f, 0.15f, value => material.SetFloat(whiteBlendId, value))
+            .SetEase(Ease.OutSine));
     }
 
     private Vector3 GetBlockPositionFromCoordinate(Vector3Int coordinate)
     {
-        var newBlockPosition = Grid.GridCoordinatesToWorldPosition(coordinate) + _blockYAdjustment * Vector3.up;
+        var newBlockPosition = Grid.GridCoordinatesToWorldPosition(coordinate);
         return newBlockPosition;
     }
 
     private void TurnPreviewHorizontally(float turnDirection)
     {
-        if (!_blockPreview.activeSelf) return;
+        if (!_blockPreview) return;
 
         var turnAngle = Mathf.Sign(turnDirection) * 90f;
         RotatePreviewModel(turnAngle, Vector3Int.up);
@@ -166,7 +208,7 @@ public class BuildingPlacement : MonoBehaviour
 
     private void TurnPreviewVertically(float turnDirection)
     {
-        if (!_blockPreview.activeSelf) return;
+        if (!_blockPreview) return;
         turnDirection *= -1;
         
         var turnAngle = Mathf.Sign(turnDirection) * 90f;
@@ -204,6 +246,18 @@ public class BuildingPlacement : MonoBehaviour
             _blockPreview.transform.rotation = Quaternion.Slerp(_blockPreview.transform.rotation, _desiredPreviewRotation, t);
             yield return null;
         } while (t <= 1f);
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (_lastHoveredGridCoordinates == null || _blockPreview == null)
+            return;
+        
+        var positions = GetHitArea(_lastHoveredGridCoordinates.Value);
+        foreach (var pos in positions)
+        {
+            Gizmos.DrawCube(GetBlockPositionFromCoordinate(pos), Vector3.one);
+        }
     }
 
     private void RotateBlockPositions(float turnDirection, Vector3Int axis)

@@ -50,14 +50,14 @@ public class CameraControls : MonoBehaviour
     private void Rotate(float direction)
     {
         int intDirection = (int)-direction;
-        if (_rotationTween != null && _rotationTween.IsActive())
-            return;
+        // if (_rotationTween != null && _rotationTween.IsActive())
+        //     return;
+        _rotationTween?.Kill();
         
         _currentRotationIndex = (_currentRotationIndex + intDirection) % _rotationEulers.Length;
         if (_currentRotationIndex < 0)
             _currentRotationIndex += _rotationEulers.Length;
         
-        _rotationTween = transform.DORotate(_rotationEulers[_currentRotationIndex], 0.7f).SetEase(Ease.InSine);
-        Debug.Log($"CamRotation now set to {CurrentRotationEulers}");
+        _rotationTween = transform.DORotate(_rotationEulers[_currentRotationIndex], 0.7f).SetEase(Ease.OutSine);
     }
 }
