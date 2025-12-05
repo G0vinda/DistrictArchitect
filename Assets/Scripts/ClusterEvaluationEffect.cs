@@ -184,6 +184,7 @@ public class ClusterEvaluationEffect : MonoBehaviour
         if (dictionary[key] < Grid.MAP_SIZE) 
             return;
 
+        sequence.AppendInterval(0.2f);
         for (var i = 0; i < Grid.MAP_SIZE; i++)
         {
             var position = dim switch
@@ -196,6 +197,7 @@ public class ClusterEvaluationEffect : MonoBehaviour
 
             AddScoreAnimationForPosition(sequence, position, i+1, 0.02f);
         }
+        sequence.AppendInterval(0.2f);
     }
 
     private void HighlightNewCells(List<Vector3Int> highLightCoordinates) // Diese Methode ist etwas duplicate code. Es gibt die gleiche nochmal im CellClusterSelector

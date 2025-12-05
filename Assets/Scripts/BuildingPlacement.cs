@@ -15,7 +15,7 @@ public class BuildingPlacement : MonoBehaviour
     [SerializeField] private CameraControls cameraControls;
     [SerializeField] private Material buildingPreviewMaterial;
     [SerializeField] private Material buildingPreviewDisabledMaterial;
-    [SerializeField] private float previewMaterialAlpha = 0.6f;
+    [SerializeField] private float previewMaterialAlpha = 0.8f;
     
     public bool IsPlacing => _currentShapeObject != null;
     public Grid Grid { get; private set; }
