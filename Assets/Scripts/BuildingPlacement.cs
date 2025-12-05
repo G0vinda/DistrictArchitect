@@ -4,6 +4,7 @@ using System.Linq;
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class BuildingPlacement : MonoBehaviour
 {
@@ -16,6 +17,7 @@ public class BuildingPlacement : MonoBehaviour
     [SerializeField] private Material buildingPreviewMaterial;
     [SerializeField] private Material buildingPreviewDisabledMaterial;
     [SerializeField] private float previewMaterialAlpha = 0.6f;
+    [SerializeField] private UnityEvent<int> floorChanged; 
     
     public bool IsPlacing => _currentShapeObject != null;
     public Grid Grid { get; private set; }
@@ -80,6 +82,7 @@ public class BuildingPlacement : MonoBehaviour
         
         _currentFloor = newFloor;
         cameraControls.SetNewHeight(_currentFloor * FLOOR_HEIGHT);
+        floorChanged?.Invoke(_currentFloor);
         _lastHoveredGridCoordinates += Vector3Int.up * (int)floorChange;
         UpdatePreview();
     }
