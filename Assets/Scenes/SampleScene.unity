@@ -2574,7 +2574,7 @@ MonoBehaviour:
   cameraControls: {fileID: 1088046477}
   buildingPreviewMaterial: {fileID: 2100000, guid: c5c0b2281799a694686a8e230be46256, type: 2}
   buildingPreviewDisabledMaterial: {fileID: 2100000, guid: 9aa3a9b17bb3f704391e3205932525c7, type: 2}
-  previewMaterialAlpha: 0.6
+  previewMaterialAlpha: 0.8
 --- !u!4 &2067620725
 Transform:
   m_ObjectHideFlags: 0

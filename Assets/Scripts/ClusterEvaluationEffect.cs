@@ -26,6 +26,7 @@ public class ClusterEvaluationEffect : MonoBehaviour
     private float maxScoreSpeed = 0.01f;
     
     private int maxEffektCount = 15;
+    private int maxScorePerCube = 10;
 
 
     private Vector3 _desiredCameraPosition;
@@ -110,8 +111,9 @@ public class ClusterEvaluationEffect : MonoBehaviour
                 var speed = Mathf.Lerp(minScoreSpeed, maxScoreSpeed, camEffektIntensity);
                 AddScoreAnimationForPosition(validationSequence, point, scorePerCube, speed);
 
-                scorePerCube++;
-
+                if (i % 2 == 0 && scorePerCube < maxScorePerCube)
+                    scorePerCube++;
+                
                 TryScoreRow(validationSequence, groupByYZ, new Vector2Int(point.y, point.z), 0);
                 TryScoreRow(validationSequence, groupByXZ, new Vector2Int(point.x, point.z), 1);
                 TryScoreRow(validationSequence, groupByXY, new Vector2Int(point.x, point.y), 2);
@@ -182,6 +184,7 @@ public class ClusterEvaluationEffect : MonoBehaviour
         if (dictionary[key] < Grid.MAP_SIZE) 
             return;
 
+        sequence.AppendInterval(0.2f);
         for (var i = 0; i < Grid.MAP_SIZE; i++)
         {
             var position = dim switch
@@ -192,8 +195,9 @@ public class ClusterEvaluationEffect : MonoBehaviour
                 _ => Vector3Int.zero
             };
 
-            AddScoreAnimationForPosition(sequence, position, 1, 0.05f);
+            AddScoreAnimationForPosition(sequence, position, i+1, 0.02f);
         }
+        sequence.AppendInterval(0.2f);
     }
 
     private void HighlightNewCells(List<Vector3Int> highLightCoordinates) // Diese Methode ist etwas duplicate code. Es gibt die gleiche nochmal im CellClusterSelector
