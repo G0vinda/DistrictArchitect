@@ -38,7 +38,7 @@ public class ClusterEvaluationEffect : MonoBehaviour
         var grid = buildingPlacement.Grid;
         _desiredCameraPosition = _camera.transform.position;
 
-        var validationSequence = DOTween.Sequence();
+        var validationSequence = DOTween.Sequence(); // Das hier ist die Animation für die End validierung. 
         
         var cellCoordinates = grid.GetAllCellCoordinates();
         while (cellCoordinates.Count > 0)
@@ -52,7 +52,9 @@ public class ClusterEvaluationEffect : MonoBehaviour
             for (int i = 0; i < currentCluster.Count; i++)
             {
                 var cell = grid.GetCellObjectAtCoordinates(currentCluster[i]);
-                validationSequence.AppendCallback(() => cell.DestroyWithVfx());
+                validationSequence.AppendCallback(() => cell.DestroyWithVfx()); // Hier wir eine Celle "abgerechnet", das i zeigt die Position im Cluster
+                // Wenn du Text Animation einbauen willst, dann wäre hier ein guter Platz dafür
+                //validationSequence.AppendCallback(() => deine punkte text funktion oder so);
                 var camEffektIntensity = Mathf.InverseLerp(0, maxEffektCount - 1, i);
                 var camShakeDuration = Mathf.Lerp(minCameraShakeDuration, maxCameraShakeDuration, camEffektIntensity);
                 var camShakeStrength = Mathf.Lerp(minCameraShakeStrength, maxCameraShakeStrength, camEffektIntensity);
@@ -69,7 +71,7 @@ public class ClusterEvaluationEffect : MonoBehaviour
         StartCoroutine(CameraFollowAnimation());
     }
 
-    private void HighlightCells(List<Vector3Int> highLightCoordinates)
+    private void HighlightCells(List<Vector3Int> highLightCoordinates) // Diese Methode ist etwas duplicate code. Es gibt die gleiche nochmal im CellClusterSelector
     {
         var ignoreTransparency = 0.15f;
         foreach (var cellObject in buildingPlacement.Grid.GetAllCellObjects())
