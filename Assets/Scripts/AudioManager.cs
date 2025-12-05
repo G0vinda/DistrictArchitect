@@ -5,14 +5,15 @@ using Random = UnityEngine.Random;
 [RequireComponent(typeof(AudioSource))]
 public class AudioManager : MonoBehaviour
 {
-    [Header("References")]
-    [SerializeField] BuildingPlacement buildingPlacement;
+    [Header("References")] [SerializeField]
+    BuildingPlacement buildingPlacement;
+
     [SerializeField] private AudioSource hoverSoundPlayer;
 
-    [Header("Clips")] 
-    [SerializeField] private AudioClip[] buildingPlaceClips;
+    [Header("Clips")] [SerializeField] private AudioClip[] buildingPlaceClips;
     [SerializeField] private AudioClip[] cellDestroyClips;
     [SerializeField] private AudioClip[] uiClickClips;
+    [SerializeField] private AudioClip scoreClip;
     
     private AudioClip _lastBuildingPlaceClip;
     private AudioClip _lastCellDestroyClip;
@@ -25,6 +26,7 @@ public class AudioManager : MonoBehaviour
     {
         buildingPlacement.PlacedBuilding += OnPlacedBuilding;
         CellObject.CellObjectDestroyed += OnCellDestroyed;
+        CellObject.CellObjectScored += OnCellScored;
     }
     
     private void OnDisable()
@@ -64,5 +66,10 @@ public class AudioManager : MonoBehaviour
         if (withoutClip)
             clipList.Remove(withoutClip);
         return clips[UnityEngine.Random.Range(0, clipList.Count)];
+    }
+
+    private void OnCellScored(Vector3 position)
+    {
+        AudioSource.PlayClipAtPoint(scoreClip, position);
     }
 }

@@ -13,7 +13,10 @@ public class CellObject : MonoBehaviour
     private static readonly int WHITE_BLEND = Shader.PropertyToID("_WhiteBlend");
     private static readonly int DISABLED = Shader.PropertyToID("_Disabled");
 
+    private int value = 0;
+
     public static event Action<Vector3> CellObjectDestroyed;
+    public static event Action<Vector3> CellObjectScored;
 
     public CellData CellData
     {
@@ -55,5 +58,16 @@ public class CellObject : MonoBehaviour
         vfx.Play();
         CellObjectDestroyed?.Invoke(transform.position);
         Destroy(gameObject);
+    }
+
+    public void IncreaseValue(int increaseValue)
+    {
+        value += increaseValue;
+        CellObjectScored?.Invoke(transform.position);
+    }
+
+    public int GetValue()
+    {
+        return value;
     }
 }

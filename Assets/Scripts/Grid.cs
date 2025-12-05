@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Grid
 {
-    private Dictionary<Vector3Int, CellObject> grid = new();
+    private readonly Dictionary<Vector3Int, CellObject> grid = new();
 
     public const int MAP_SIZE = 6;
     public const float CELL_SIZE = 1f;
@@ -77,6 +77,9 @@ public class Grid
 
     public List<Vector3Int> FindCellCluster(Vector3Int startCoordinate)
     {
+        if (grid[startCoordinate] == null) 
+            return new List<Vector3Int>();
+        
         var openCoordinates = new Queue<Vector3Int>();
         openCoordinates.Enqueue(startCoordinate);
         var closedCoordinates = new HashSet<Vector3Int>() {startCoordinate};
@@ -105,5 +108,30 @@ public class Grid
             }
         }
         return clusterCoordinates;
+    }
+
+    public List<Vector3Int> GetAllGridCoordinates()
+    {
+        return grid.Keys.ToList();
+    }
+
+    public List<Vector3Int> GetRow(Vector2Int rowConstant, int dimension)
+    {
+        var row = new List<Vector3Int>();
+
+        for (var i = 0; i < MAP_SIZE; i++)
+        {
+            switch (dimension)
+            {
+                case 0: row.Add(new Vector3Int(i, rowConstant.x, rowConstant.y));
+                    break;
+                case 1: row.Add(new Vector3Int(rowConstant.x, i, rowConstant.y));
+                    break;
+                case 2: row.Add(new Vector3Int(rowConstant.x, rowConstant.y, i));
+                    break;
+            }
+        }
+
+        return row;
     }
 }

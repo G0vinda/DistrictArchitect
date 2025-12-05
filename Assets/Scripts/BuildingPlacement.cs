@@ -21,6 +21,7 @@ public class BuildingPlacement : MonoBehaviour
     public Grid Grid { get; private set; }
     
     public Action<Vector3> PlacedBuilding;
+    public Action<Vector3> ScoredCell;
     
     private Camera _cam;
     private int _currentFloor;
@@ -90,16 +91,6 @@ public class BuildingPlacement : MonoBehaviour
 
         var floorY = floor * FLOOR_HEIGHT;
         var mouseRay = _cam.ScreenPointToRay(mousePosition);
-        // if (Physics.Raycast(mouseRay, out RaycastHit hit) && 
-        //     hit.point.y > floorY + float.Epsilon && 
-        //     hit.point.y < floorY + FLOOR_HEIGHT)
-        // {
-        //     
-        // }
-        // else
-        // {
-        //     
-        // }
         
         if (!mouseRay.TryGetPositionAtY(floorY, out var hitCoordinates))
             return;
