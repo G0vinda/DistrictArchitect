@@ -34,7 +34,6 @@ public class ClusterEvaluationEffect : MonoBehaviour
 
     private int totalScore = 0;
     private int currentClusterScore = 0;
-    private int currentRowScore
 
     private void Awake()
     {
