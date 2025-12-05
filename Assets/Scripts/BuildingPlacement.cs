@@ -20,7 +20,7 @@ public class BuildingPlacement : MonoBehaviour
     public bool IsPlacing => _currentShapeObject != null;
     public Grid Grid { get; private set; }
     
-    public Action PlacedBuilding;
+    public Action<Vector3> PlacedBuilding;
     
     private Camera _cam;
     private int _currentFloor;
@@ -160,7 +160,7 @@ public class BuildingPlacement : MonoBehaviour
         PlayPlacementAnimation();
         _currentShapeObject = null;
         
-        PlacedBuilding?.Invoke();
+        PlacedBuilding?.Invoke(finalShapePosition);
     }
 
     private void PlayPlacementAnimation()

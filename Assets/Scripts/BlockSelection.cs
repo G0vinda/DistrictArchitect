@@ -56,7 +56,7 @@ public class BlockSelection : MonoBehaviour
         _selectedField = selectionField;
     }
     
-    private void OnBuildingPlaced()
+    private void OnBuildingPlaced(Vector3 _)
     {
         _selectedField.SetShapeDefinition(shapeManager.GetRandomShapeDefinition());
         CancelSelection();

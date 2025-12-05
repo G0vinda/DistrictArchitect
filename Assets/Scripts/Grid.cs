@@ -65,6 +65,11 @@ public class Grid
         return grid.Values.Where(cell => cell != null).ToList();
     }
 
+    public List<Vector3Int> GetAllCellCoordinates()
+    {
+        return grid.Keys.Where(coord => grid[coord] != null).ToList();
+    }
+
     public CellObject GetCellObjectAtCoordinates(Vector3Int coordinates)
     {
         return grid[coordinates];

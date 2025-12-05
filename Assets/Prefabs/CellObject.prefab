@@ -49,6 +49,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <Collider>k__BackingField: {fileID: 7659563101745739194}
   meshRenderer: {fileID: 2191275498526944379}
+  destroyVfxPrefab: {fileID: 4573185609371371199, guid: 2783b60473973b0489d283522744da72, type: 3}
 --- !u!33 &1147143066945845942
 MeshFilter:
   m_ObjectHideFlags: 0
