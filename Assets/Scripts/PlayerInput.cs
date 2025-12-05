@@ -73,7 +73,7 @@ public class PlayerInput : ScriptableObject, Controls.IPlayerActions
         if (!context.performed)
             return;
         
-        OnFloorChanged?.Invoke(-context.ReadValue<float>());
+        OnFloorChanged?.Invoke(context.ReadValue<float>());
     }
 
     public void OnTurnCameraHorizontally(InputAction.CallbackContext context)
