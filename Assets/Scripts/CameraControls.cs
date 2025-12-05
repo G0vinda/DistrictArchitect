@@ -50,6 +50,9 @@ public class CameraControls : MonoBehaviour
     private void Rotate(float direction)
     {
         int intDirection = (int)-direction;
+        if (Quaternion.Angle(transform.rotation, Quaternion.Euler(_rotationEulers[_currentRotationIndex])) > 91f)
+            return;
+        
         // if (_rotationTween != null && _rotationTween.IsActive())
         //     return;
         _rotationTween?.Kill();
