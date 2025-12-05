@@ -109,8 +109,6 @@ public class ClusterEvaluationEffect : MonoBehaviour
         }
 
         validationSequence.AppendInterval(0.5f);
-        validationSequence.AppendCallback(() =>
-            currentClusterScorePerCube = Mathf.FloorToInt(currentClusterScore / (float)currentCluster.Count));
         
         for (var i = 0; i < currentCluster.Count; i++)
         {
