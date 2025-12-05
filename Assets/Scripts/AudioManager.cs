@@ -41,9 +41,9 @@ public class AudioManager : MonoBehaviour
 
     public void OnUIHovered()
     {
-        var pitch = Random.Range(MIN_HOVER_SOUND_PITCH, MAX_HOVER_SOUND_PITCH);
-        hoverSoundPlayer.pitch = pitch;
-        hoverSoundPlayer.Play();
+        // var pitch = Random.Range(MIN_HOVER_SOUND_PITCH, MAX_HOVER_SOUND_PITCH);
+        // hoverSoundPlayer.pitch = pitch;
+        // hoverSoundPlayer.Play();
     }
 
     public void OnUIClicked()
