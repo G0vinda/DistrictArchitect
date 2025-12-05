@@ -9,6 +9,7 @@ public class Grid
     public const int MAP_SIZE = 6;
     public const float CELL_SIZE = 1f;
     public const float BLOCK_OFFSET = 0.5f;
+    public const int GAME_OVER_HEIGHT = 5;
 
     public Grid()
     {
@@ -52,12 +53,16 @@ public class Grid
             coordinates.z * CELL_SIZE + BLOCK_OFFSET);
     }
 
-    public void PlaceShapeAtPosition(ShapeObject shape, Vector3Int position)
+    public bool PlaceShapeAtPosition(ShapeObject shape, Vector3Int position)
     {
+        var doesPlacementFinishGame = false;
         foreach (var (localCoordinate, cell) in shape.CellsByCoordinate)
         {
-            grid[localCoordinate + position] = cell;
+            var gridCoordinate = localCoordinate + position;
+            if (gridCoordinate.y >= (GAME_OVER_HEIGHT-1)) doesPlacementFinishGame = true;
+            grid[gridCoordinate] = cell;
         }
+        return doesPlacementFinishGame;
     }
 
     public List<CellObject> GetAllCellObjects()

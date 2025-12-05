@@ -21,7 +21,7 @@ public class BuildingPlacement : MonoBehaviour
     public Grid Grid { get; private set; }
     
     public Action<Vector3> PlacedBuilding;
-    public Action<Vector3> ScoredCell;
+    public Action GameOver;
     
     private Camera _cam;
     private int _currentFloor;
@@ -145,13 +145,14 @@ public class BuildingPlacement : MonoBehaviour
         var finalShapeCoordinates = _lastHoveredGridCoordinates.Value + Vector3Int.up * _blockYAdjustment;
         var finalShapePosition = GetBlockPositionFromCoordinate(finalShapeCoordinates);
         _currentShapeObject.transform.position = finalShapePosition;
-        Grid.PlaceShapeAtPosition(_currentShapeObject, finalShapeCoordinates);
+        var isGameOver = Grid.PlaceShapeAtPosition(_currentShapeObject, finalShapeCoordinates);
         _currentShapeObject.SetMaterialAlpha(1.0f);
         _currentShapeObject.EnableColliders();
         PlayPlacementAnimation();
         _currentShapeObject = null;
         
         PlacedBuilding?.Invoke(finalShapePosition);
+        if(isGameOver) GameOver?.Invoke();
     }
 
     private void PlayPlacementAnimation()

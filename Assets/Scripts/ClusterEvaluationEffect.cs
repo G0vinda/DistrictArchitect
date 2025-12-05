@@ -39,6 +39,16 @@ public class ClusterEvaluationEffect : MonoBehaviour
         _camera = Camera.main;
     }
 
+    private void OnEnable()
+    {
+        buildingPlacement.GameOver += PlayEndValidation;
+    }
+
+    private void OnDisable()
+    {
+        buildingPlacement.GameOver -= PlayEndValidation;
+    }
+
     [ContextMenu("Play End Validation")]
     public void PlayEndValidation()
     {
