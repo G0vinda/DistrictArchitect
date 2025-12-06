@@ -6,7 +6,7 @@ public class Grid
 {
     private readonly Dictionary<Vector3Int, CellObject> grid = new();
 
-    public const int MAP_SIZE = 6;
+    public const int MAP_SIZE = 5;
     public const float CELL_SIZE = 1f;
     public const float BLOCK_OFFSET = 0.5f;
     public const int GAME_OVER_HEIGHT = 5;

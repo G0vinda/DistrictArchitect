@@ -6,6 +6,7 @@ using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
+using UnityEngine.UI;
 
 public class ClusterEvaluationEffect : MonoBehaviour
 {
@@ -16,6 +17,8 @@ public class ClusterEvaluationEffect : MonoBehaviour
     [SerializeField] private float cameraSpeed;
     [SerializeField] private TextMeshProUGUI totalScoreText;
     [SerializeField] private TextMeshProUGUI clusterScoreText;
+    [SerializeField] private Button retryButton;
+    [SerializeField] private GameObject finishPlane;
 
     private float minCameraShakeStrength = 0.05f;
     private float maxCameraShakeStrength = 1f;
@@ -58,6 +61,7 @@ public class ClusterEvaluationEffect : MonoBehaviour
         buildingPlacement.enabled = false;
         cellClusterSelector.enabled = false;
         selectionUI.SetActive(false);
+        finishPlane.SetActive(false);
         
         var grid = buildingPlacement.Grid;
         _desiredCameraPosition = _camera.transform.position;
@@ -132,6 +136,8 @@ public class ClusterEvaluationEffect : MonoBehaviour
             
             cellCoordinates.Remove(currentCluster[i]);
         }
+
+        validationSequence.AppendCallback(() => retryButton.gameObject.SetActive(true));
     }
 
     private void AddDestroyBlockSequence(Sequence validationSequence, CellObject cell, float camEffektIntensity)

@@ -10,8 +10,6 @@ public class BuildingPlacement : MonoBehaviour
 {
     [SerializeField] private CameraControls camControls;
     [SerializeField] private PlayerInput playerInput;
-    [SerializeField] private GameObject buildingBlockPrefab;
-    [SerializeField] private GameObject buildingBlockPreviewPrefab;
     [SerializeField] private TextMeshProUGUI debugHoverText;
     [SerializeField] private CameraControls cameraControls;
     [SerializeField] private Material buildingPreviewMaterial;
