@@ -85,6 +85,7 @@ public class ClusterEvaluationEffect : MonoBehaviour
             totalScoreText.text = "";
         });
 
+        validationSequence.AppendCallback(() => retryButton.gameObject.SetActive(true));
         StartCoroutine(CameraFollowAnimation());
     }
     
@@ -136,8 +137,6 @@ public class ClusterEvaluationEffect : MonoBehaviour
             
             cellCoordinates.Remove(currentCluster[i]);
         }
-
-        validationSequence.AppendCallback(() => retryButton.gameObject.SetActive(true));
     }
 
     private void AddDestroyBlockSequence(Sequence validationSequence, CellObject cell, float camEffektIntensity)
