@@ -1,5 +1,4 @@
 using System;
-using PlasticGui.WorkspaceWindow.Diff;
 using UnityEngine;
 
 [RequireComponent(typeof(MeshRenderer))]
