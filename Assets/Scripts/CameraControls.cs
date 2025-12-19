@@ -93,7 +93,7 @@ public class CameraControls : MonoBehaviour
         _currentRotationIndex = Array.IndexOf(_rotationEulers, closestFixedRotation);
         
         _rotationTween?.Kill();
-        _rotationTween = transform.DORotate(closestFixedRotation, 0.2f).SetEase(Ease.OutSine);
+        _rotationTween = transform.DORotate(closestFixedRotation, 0.15f).SetEase(Ease.OutSine);
         _rotationTween.OnComplete(() =>
         {
             Cursor.lockState = CursorLockMode.None;
@@ -108,6 +108,11 @@ public class CameraControls : MonoBehaviour
         
         while (true)
         {
+            if (playerInput.MouseDelta.magnitude < 2f)
+            {
+                yield return null;
+                continue;
+            }
             transform.Rotate(Vector3.up, playerInput.MouseDelta.x * 20f * Time.deltaTime);
             var currentVerticalAngle = childCam.transform.eulerAngles.x;
             var newAngle = Mathf.Clamp(currentVerticalAngle -playerInput.MouseDelta.y * 20f * Time.deltaTime, minVerticalRotationAngle, maxVerticalRotationAngle);
