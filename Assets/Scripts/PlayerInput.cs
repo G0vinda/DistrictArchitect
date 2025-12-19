@@ -19,10 +19,13 @@ public class PlayerInput : ScriptableObject, Controls.IPlayerActions
     public Action OnCancelled;
     
     private Vector2 _mousePositionOnSecondaryPressStart;
+    private float _timeOnSecondaryPressStart;
+    private bool _cancelOnRelease;
     private bool _isSecondaryDragging;
     private bool _isSecondaryPressed;
     
     private const float DRAG_DISTANCE_THRESHOLD = 15f;
+    private const float DRAG_TIME_THRESHOLD = 0.8f;
     
     Controls controls;
     
@@ -123,6 +126,7 @@ public class PlayerInput : ScriptableObject, Controls.IPlayerActions
         {
             _mousePositionOnSecondaryPressStart = MousePosition;
             _isSecondaryPressed = true;
+            _cancelOnRelease = true;
         }
         else if (_isSecondaryDragging)
         {
