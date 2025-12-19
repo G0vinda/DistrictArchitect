@@ -5,6 +5,7 @@ using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.InputSystem;
 
 public class BuildingPlacement : MonoBehaviour
 {
@@ -22,7 +23,7 @@ public class BuildingPlacement : MonoBehaviour
     
     public Action<Vector3> PlacedBuilding;
     public Action GameOver;
-    
+
     private Camera _cam;
     private int _currentFloor;
     private Vector3Int? _lastHoveredGridCoordinates;
@@ -47,7 +48,7 @@ public class BuildingPlacement : MonoBehaviour
         playerInput.OnHorizontalTurn += TurnPreviewHorizontally;
         playerInput.OnFloorChanged += AdjustPlacementHeightToFloorChange;
         playerInput.OnCameraRotationStarted += FreezePreviewUpdate;
-        playerInput.OnCameraRotationReleased += UnfreezePreviewUpdate;
+        cameraControls.OnCameraSnappedInPlace += UnfreezePreviewUpdate;
     }
 
     private void OnDisable()
@@ -128,7 +129,7 @@ public class BuildingPlacement : MonoBehaviour
         
         var hitArea = GetHitArea(_lastHoveredGridCoordinates.Value); 
         
-        _currentShapeObject.transform.position = GetBlockPositionFromCoordinate(_lastHoveredGridCoordinates.Value + Vector3Int.up * _blockYAdjustment);
+        _currentShapeObject.transform.position = Grid.GridCoordinatesToWorldPosition(_lastHoveredGridCoordinates.Value + Vector3Int.up * _blockYAdjustment);
         _currentShapeObject.Show();
 
         _placeable = Grid.CanShapeBePlacedAtArea(hitArea);
@@ -153,7 +154,7 @@ public class BuildingPlacement : MonoBehaviour
             return;
 
         var finalShapeCoordinates = _lastHoveredGridCoordinates.Value + Vector3Int.up * _blockYAdjustment;
-        var finalShapePosition = GetBlockPositionFromCoordinate(finalShapeCoordinates);
+        var finalShapePosition = Grid.GridCoordinatesToWorldPosition(finalShapeCoordinates);
         _currentShapeObject.transform.position = finalShapePosition;
         var isGameOver = Grid.PlaceShapeAtPosition(_currentShapeObject, finalShapeCoordinates);
         _currentShapeObject.SetMaterialAlpha(1.0f);
@@ -174,12 +175,6 @@ public class BuildingPlacement : MonoBehaviour
         placementAnimation.Append(animationShapeReference.transform.DOScale(Vector3.one * 1f, 0.15f).SetEase(Ease.OutSine));
         placementAnimation.Join(DOVirtual.Float(0.6f, 0f, 0.15f, value => animationShapeReference.SetMaterialWhiteBlend(value))
             .SetEase(Ease.OutSine));
-    }
-
-    private Vector3 GetBlockPositionFromCoordinate(Vector3Int coordinate)
-    {
-        var newBlockPosition = Grid.GridCoordinatesToWorldPosition(coordinate);
-        return newBlockPosition;
     }
 
     private void TurnPreviewHorizontally(float turnDirection)
@@ -209,5 +204,17 @@ public class BuildingPlacement : MonoBehaviour
     }
     
     private void FreezePreviewUpdate() => _freezePreviewUpdate = true;
-    private void UnfreezePreviewUpdate() => _freezePreviewUpdate = false;
+
+    private void UnfreezePreviewUpdate()
+    {
+        if (_lastHoveredGridCoordinates != null)
+        {
+            var lastHoveredWorldPosition = Grid.GridCoordinatesToWorldPosition(_lastHoveredGridCoordinates.Value);
+            lastHoveredWorldPosition -= new Vector3(0, Grid.CELL_SIZE/2, 0);
+            var newMousePosition = _cam.WorldToScreenPoint(lastHoveredWorldPosition);
+            Mouse.current.WarpCursorPosition(newMousePosition);
+        }
+
+        _freezePreviewUpdate = false;
+    }
 }

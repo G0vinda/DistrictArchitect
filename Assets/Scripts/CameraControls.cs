@@ -19,6 +19,8 @@ public class CameraControls : MonoBehaviour
     private float _startHeight;
     private Coroutine _dragCoroutine;
 
+    public Action OnCameraSnappedInPlace;
+
     private void Start()
     {
         _startHeight = transform.position.y;
@@ -35,15 +37,15 @@ public class CameraControls : MonoBehaviour
     private void OnEnable()
     {
         playerInput.OnCameraTurn += Rotate;
-        playerInput.OnCameraRotationStarted += OnCameraRotationStarted;
-        playerInput.OnCameraRotationReleased += OnCameraRotationReleased;
+        playerInput.OnCameraRotationStarted += StartCameraFreeRotation;
+        playerInput.OnCameraRotationReleased += ReleaseCameraFromFreeRotation;
     }
     
     private void OnDisable()
     {
         playerInput.OnCameraTurn -= Rotate;
-        playerInput.OnCameraRotationStarted -= OnCameraRotationStarted;
-        playerInput.OnCameraRotationReleased -= OnCameraRotationReleased;
+        playerInput.OnCameraRotationStarted -= StartCameraFreeRotation;
+        playerInput.OnCameraRotationReleased -= ReleaseCameraFromFreeRotation;
     }
 
     public void SetNewHeight(float newHeight)
@@ -72,13 +74,13 @@ public class CameraControls : MonoBehaviour
         _rotationTween = transform.DORotate(_rotationEulers[_currentRotationIndex], 0.7f).SetEase(Ease.OutSine);
     }
 
-    private void OnCameraRotationStarted()
+    private void StartCameraFreeRotation()
     {
         _dragCoroutine = StartCoroutine(Drag());
         Cursor.lockState = CursorLockMode.Locked;
     }
 
-    private void OnCameraRotationReleased()
+    private void ReleaseCameraFromFreeRotation()
     {
         StopCoroutine(_dragCoroutine);
 
@@ -88,10 +90,15 @@ public class CameraControls : MonoBehaviour
             currentEulerY += 360;
         var closestFixedRotation = _rotationEulers.OrderBy(euler =>
             Mathf.Min(Mathf.Abs(currentEulerY - euler.y), Mathf.Abs(currentEulerY - 360 - euler.y))).First();
-        _rotationTween?.Kill();
-        _rotationTween = _rotationTween = transform.DORotate(closestFixedRotation, 0.2f).SetEase(Ease.OutSine);
         _currentRotationIndex = Array.IndexOf(_rotationEulers, closestFixedRotation);
-        Cursor.lockState = CursorLockMode.None;
+        
+        _rotationTween?.Kill();
+        _rotationTween = transform.DORotate(closestFixedRotation, 0.2f).SetEase(Ease.OutSine);
+        _rotationTween.OnComplete(() =>
+        {
+            Cursor.lockState = CursorLockMode.None;
+            OnCameraSnappedInPlace?.Invoke();
+        });
     }
 
     private IEnumerator Drag()
