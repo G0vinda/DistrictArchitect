@@ -155,13 +155,31 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""RighClick"",
+                    ""name"": ""Cancel"",
                     ""type"": ""Button"",
                     ""id"": ""ee15ee69-1e1b-4d41-a20b-608ee3acdb26"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Hold Camera Free Rotation"",
+                    ""type"": ""Button"",
+                    ""id"": ""9bc504fa-41ff-41da-adef-e8507ea3dba8"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""MouseMovement"",
+                    ""type"": ""Value"",
+                    ""id"": ""b059419d-95a3-4222-b164-a011faaa805b"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -334,10 +352,32 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""name"": """",
                     ""id"": ""d660d0a7-605f-40b5-a356-324ef0292f3b"",
                     ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": ""Press"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Cancel"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""3ba00e23-6ff6-4a21-91c7-4a53cf7f25c6"",
+                    ""path"": ""<Mouse>/middleButton"",
+                    ""interactions"": ""Press(behavior=2)"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Hold Camera Free Rotation"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""953461ca-a6b7-4530-afb3-3166a142ab91"",
+                    ""path"": ""<Mouse>/delta"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""RighClick"",
+                    ""action"": ""MouseMovement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -355,7 +395,9 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         m_Player_ChangeFloor = m_Player.FindAction("Change Floor", throwIfNotFound: true);
         m_Player_TurnCameraHorizontally = m_Player.FindAction("Turn Camera Horizontally", throwIfNotFound: true);
         m_Player_Pause = m_Player.FindAction("Pause", throwIfNotFound: true);
-        m_Player_RighClick = m_Player.FindAction("RighClick", throwIfNotFound: true);
+        m_Player_Cancel = m_Player.FindAction("Cancel", throwIfNotFound: true);
+        m_Player_HoldCameraFreeRotation = m_Player.FindAction("Hold Camera Free Rotation", throwIfNotFound: true);
+        m_Player_MouseMovement = m_Player.FindAction("MouseMovement", throwIfNotFound: true);
     }
 
     ~@Controls()
@@ -443,7 +485,9 @@ public partial class @Controls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_ChangeFloor;
     private readonly InputAction m_Player_TurnCameraHorizontally;
     private readonly InputAction m_Player_Pause;
-    private readonly InputAction m_Player_RighClick;
+    private readonly InputAction m_Player_Cancel;
+    private readonly InputAction m_Player_HoldCameraFreeRotation;
+    private readonly InputAction m_Player_MouseMovement;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -484,9 +528,17 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @Pause => m_Wrapper.m_Player_Pause;
         /// <summary>
-        /// Provides access to the underlying input action "Player/RighClick".
+        /// Provides access to the underlying input action "Player/Cancel".
         /// </summary>
-        public InputAction @RighClick => m_Wrapper.m_Player_RighClick;
+        public InputAction @Cancel => m_Wrapper.m_Player_Cancel;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/HoldCameraFreeRotation".
+        /// </summary>
+        public InputAction @HoldCameraFreeRotation => m_Wrapper.m_Player_HoldCameraFreeRotation;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/MouseMovement".
+        /// </summary>
+        public InputAction @MouseMovement => m_Wrapper.m_Player_MouseMovement;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -534,9 +586,15 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @Pause.started += instance.OnPause;
             @Pause.performed += instance.OnPause;
             @Pause.canceled += instance.OnPause;
-            @RighClick.started += instance.OnRighClick;
-            @RighClick.performed += instance.OnRighClick;
-            @RighClick.canceled += instance.OnRighClick;
+            @Cancel.started += instance.OnCancel;
+            @Cancel.performed += instance.OnCancel;
+            @Cancel.canceled += instance.OnCancel;
+            @HoldCameraFreeRotation.started += instance.OnHoldCameraFreeRotation;
+            @HoldCameraFreeRotation.performed += instance.OnHoldCameraFreeRotation;
+            @HoldCameraFreeRotation.canceled += instance.OnHoldCameraFreeRotation;
+            @MouseMovement.started += instance.OnMouseMovement;
+            @MouseMovement.performed += instance.OnMouseMovement;
+            @MouseMovement.canceled += instance.OnMouseMovement;
         }
 
         /// <summary>
@@ -569,9 +627,15 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             @Pause.started -= instance.OnPause;
             @Pause.performed -= instance.OnPause;
             @Pause.canceled -= instance.OnPause;
-            @RighClick.started -= instance.OnRighClick;
-            @RighClick.performed -= instance.OnRighClick;
-            @RighClick.canceled -= instance.OnRighClick;
+            @Cancel.started -= instance.OnCancel;
+            @Cancel.performed -= instance.OnCancel;
+            @Cancel.canceled -= instance.OnCancel;
+            @HoldCameraFreeRotation.started -= instance.OnHoldCameraFreeRotation;
+            @HoldCameraFreeRotation.performed -= instance.OnHoldCameraFreeRotation;
+            @HoldCameraFreeRotation.canceled -= instance.OnHoldCameraFreeRotation;
+            @MouseMovement.started -= instance.OnMouseMovement;
+            @MouseMovement.performed -= instance.OnMouseMovement;
+            @MouseMovement.canceled -= instance.OnMouseMovement;
         }
 
         /// <summary>
@@ -662,11 +726,25 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnPause(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "RighClick" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "Cancel" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnRighClick(InputAction.CallbackContext context);
+        void OnCancel(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Hold Camera Free Rotation" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnHoldCameraFreeRotation(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "MouseMovement" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnMouseMovement(InputAction.CallbackContext context);
     }
 }

@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 public class PlayerInput : ScriptableObject, Controls.IPlayerActions
 {
     public Vector2 MousePosition { get; private set; }
+    public Vector2 MouseDelta { get; private set; }
     
     public Action<Vector2> OnMousePositionChanged;
     public Action OnMouseClicked;
@@ -13,7 +14,9 @@ public class PlayerInput : ScriptableObject, Controls.IPlayerActions
     public Action<float> OnVerticalTurn;
     public Action<float> OnCameraTurn;
     public Action<float> OnFloorChanged;
-    public Action OnRightClicked;
+    public Action OnCameraRotationStarted;
+    public Action OnCameraRotationReleased;
+    public Action OnCancelled;
     
     Controls controls;
     
@@ -90,11 +93,34 @@ public class PlayerInput : ScriptableObject, Controls.IPlayerActions
         throw new NotImplementedException();
     }
 
-    public void OnRighClick(InputAction.CallbackContext context)
+    public void OnCancel(InputAction.CallbackContext context)
+    {
+        if (!context.performed)
+            return;    
+        
+        OnCancelled?.Invoke();
+    }
+
+    public void OnHoldCameraFreeRotation(InputAction.CallbackContext context)
     {
         if (!context.performed)
             return;
         
-        OnRightClicked?.Invoke();
+        if (context.ReadValueAsButton())
+        {
+            OnCameraRotationStarted?.Invoke();
+        }
+        else
+        {
+            OnCameraRotationReleased?.Invoke();
+        }
+    }
+
+    public void OnMouseMovement(InputAction.CallbackContext context)
+    {
+        if (!context.performed)
+            return;
+        
+        MouseDelta = context.ReadValue<Vector2>();
     }
 }

@@ -2007,6 +2007,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerInput: {fileID: 11400000, guid: 692e78c876cbd3649aea4fa9ed7f80a7, type: 2}
+  childCam: {fileID: 330585545}
 --- !u!4 &1088046478
 Transform:
   m_ObjectHideFlags: 0

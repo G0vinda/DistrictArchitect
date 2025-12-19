@@ -11,13 +11,13 @@ public class CellClusterSelector : MonoBehaviour
     private void OnEnable()
     {
         playerInput.OnMouseClicked += OnMouseClick;
-        playerInput.OnRightClicked += ResetHighlighting;
+        playerInput.OnCancelled += ResetHighlighting;
     }
     
     private void OnDisable()
     {
         playerInput.OnMouseClicked -= OnMouseClick;
-        playerInput.OnRightClicked -= ResetHighlighting;
+        playerInput.OnCancelled -= ResetHighlighting;
     }
 
     private void OnMouseClick()

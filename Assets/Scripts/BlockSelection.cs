@@ -12,13 +12,13 @@ public class BlockSelection : MonoBehaviour
 
     private void OnEnable()
     {
-        playerInput.OnRightClicked += CancelSelection;
+        playerInput.OnCancelled += CancelSelection;
         buildingPlacement.PlacedBuilding += OnBuildingPlaced;
     }
 
     private void OnDisable()
     {
-        playerInput.OnRightClicked -= CancelSelection;
+        playerInput.OnCancelled -= CancelSelection;
         buildingPlacement.PlacedBuilding -= OnBuildingPlaced;
     }
 

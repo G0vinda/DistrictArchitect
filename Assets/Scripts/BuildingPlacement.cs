@@ -29,6 +29,7 @@ public class BuildingPlacement : MonoBehaviour
     private bool _placeable;
     private int _blockYAdjustment;
     private ShapeObject _currentShapeObject;
+    private bool _freezePreviewUpdate;
     
     private const float FLOOR_HEIGHT = 1f;
     
@@ -45,13 +46,19 @@ public class BuildingPlacement : MonoBehaviour
         playerInput.OnVerticalTurn += TurnPreviewVertically;
         playerInput.OnHorizontalTurn += TurnPreviewHorizontally;
         playerInput.OnFloorChanged += AdjustPlacementHeightToFloorChange;
+        playerInput.OnCameraRotationStarted += FreezePreviewUpdate;
+        playerInput.OnCameraRotationReleased += UnfreezePreviewUpdate;
     }
 
     private void OnDisable()
     {
         playerInput.OnMousePositionChanged -= CheckForEmptyBuildingSlot;
         playerInput.OnMouseClicked -= TryPlaceBuilding;
+        playerInput.OnVerticalTurn -= TurnPreviewVertically;
+        playerInput.OnHorizontalTurn -= TurnPreviewHorizontally;
         playerInput.OnFloorChanged -= AdjustPlacementHeightToFloorChange;
+        playerInput.OnCameraRotationStarted -= FreezePreviewUpdate;
+        playerInput.OnCameraRotationReleased -= UnfreezePreviewUpdate;
     }
 
     public void SelectBlockShape(Dictionary<Vector3Int, CellData> cellDataByPositions)
@@ -130,6 +137,8 @@ public class BuildingPlacement : MonoBehaviour
 
     private void CheckForEmptyBuildingSlot(Vector2 mousePosition)
     {
+        if (_freezePreviewUpdate)
+            return;
         CheckForEmptyBuildingSlotOnFloor(_currentFloor, mousePosition);
     }
 
@@ -198,4 +207,7 @@ public class BuildingPlacement : MonoBehaviour
         _blockYAdjustment = -minY;
         UpdatePreview();
     }
+    
+    private void FreezePreviewUpdate() => _freezePreviewUpdate = true;
+    private void UnfreezePreviewUpdate() => _freezePreviewUpdate = false;
 }
