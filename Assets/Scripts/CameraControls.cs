@@ -36,14 +36,14 @@ public class CameraControls : MonoBehaviour
     {
         playerInput.OnCameraTurn += Rotate;
         playerInput.OnCameraRotationStarted += OnCameraRotationStarted;
-        playerInput.OnCameraRotationReleased += OnCameraRotationReleased;
+        playerInput.OnCameraRotationStopped += OnCameraRotationReleased;
     }
     
     private void OnDisable()
     {
         playerInput.OnCameraTurn -= Rotate;
         playerInput.OnCameraRotationStarted -= OnCameraRotationStarted;
-        playerInput.OnCameraRotationReleased -= OnCameraRotationReleased;
+        playerInput.OnCameraRotationStopped -= OnCameraRotationReleased;
     }
 
     public void SetNewHeight(float newHeight)

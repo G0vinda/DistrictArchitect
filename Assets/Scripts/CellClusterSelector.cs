@@ -26,15 +26,16 @@ public class CellClusterSelector : MonoBehaviour
             return;
         
         var mouseRay = Camera.main!.ScreenPointToRay(playerInput.MousePosition);
-        if (!Physics.Raycast(mouseRay, out RaycastHit hit))
-            return;
-
-        if (hit.collider.gameObject.GetComponent<CellObject>())
+        if (!Physics.Raycast(mouseRay, out RaycastHit hit) || !hit.collider.gameObject.GetComponent<CellObject>())
         {
-            var gridCoordinates = Grid.WorldPositionToGridCoordinates(hit.collider.transform.position);
-            Debug.Log($"Hit grid at: {gridCoordinates}");
-            HighlightCluster(gridCoordinates);
+            ResetHighlighting();
+            return;
         }
+
+        
+        var gridCoordinates = Grid.WorldPositionToGridCoordinates(hit.collider.transform.position);
+        Debug.Log($"Hit grid at: {gridCoordinates}");
+        HighlightCluster(gridCoordinates);
     }
 
     private void HighlightCluster(Vector3Int startCoordinates)

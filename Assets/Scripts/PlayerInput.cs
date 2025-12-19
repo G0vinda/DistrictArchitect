@@ -15,8 +15,14 @@ public class PlayerInput : ScriptableObject, Controls.IPlayerActions
     public Action<float> OnCameraTurn;
     public Action<float> OnFloorChanged;
     public Action OnCameraRotationStarted;
-    public Action OnCameraRotationReleased;
+    public Action OnCameraRotationStopped;
     public Action OnCancelled;
+    
+    private Vector2 _mousePositionOnSecondaryPressStart;
+    private bool _isSecondaryDragging;
+    private bool _isSecondaryPressed;
+    
+    private const float DRAG_DISTANCE_THRESHOLD = 15f;
     
     Controls controls;
     
@@ -37,11 +43,19 @@ public class PlayerInput : ScriptableObject, Controls.IPlayerActions
 
     public void OnMousePosition(InputAction.CallbackContext context)
     {
-        if (!context.performed) 
+        if (!context.performed || _isSecondaryDragging) 
             return;
         
         var newMousePosition = context.ReadValue<Vector2>();
         MousePosition = newMousePosition;
+
+        if (_isSecondaryPressed && (newMousePosition - _mousePositionOnSecondaryPressStart).magnitude > DRAG_DISTANCE_THRESHOLD)
+        {
+            _isSecondaryDragging = true;
+            OnCameraRotationStarted?.Invoke();
+            return;
+        }
+        
         OnMousePositionChanged?.Invoke(newMousePosition);
     }
 
@@ -73,7 +87,7 @@ public class PlayerInput : ScriptableObject, Controls.IPlayerActions
 
     public void OnChangeFloor(InputAction.CallbackContext context)
     {
-        if (!context.performed)
+        if (!context.performed || _isSecondaryDragging)
             return;
         
         OnFloorChanged?.Invoke(context.ReadValue<float>());
@@ -85,35 +99,11 @@ public class PlayerInput : ScriptableObject, Controls.IPlayerActions
             return;
         var turnDirection = context.ReadValue<float>();
         OnCameraTurn?.Invoke(turnDirection);
-        
     }
 
     public void OnPause(InputAction.CallbackContext context)
     {
         throw new NotImplementedException();
-    }
-
-    public void OnCancel(InputAction.CallbackContext context)
-    {
-        if (!context.performed)
-            return;    
-        
-        OnCancelled?.Invoke();
-    }
-
-    public void OnHoldCameraFreeRotation(InputAction.CallbackContext context)
-    {
-        if (!context.performed)
-            return;
-        
-        if (context.ReadValueAsButton())
-        {
-            OnCameraRotationStarted?.Invoke();
-        }
-        else
-        {
-            OnCameraRotationReleased?.Invoke();
-        }
     }
 
     public void OnMouseMovement(InputAction.CallbackContext context)
@@ -122,5 +112,28 @@ public class PlayerInput : ScriptableObject, Controls.IPlayerActions
             return;
         
         MouseDelta = context.ReadValue<Vector2>();
+    }
+
+    public void OnSecondaryButton(InputAction.CallbackContext context)
+    {
+        if (!context.performed)
+            return;
+
+        if (context.ReadValueAsButton())
+        {
+            _mousePositionOnSecondaryPressStart = MousePosition;
+            _isSecondaryPressed = true;
+        }
+        else if (_isSecondaryDragging)
+        {
+            OnCameraRotationStopped?.Invoke();
+            _isSecondaryPressed = false;
+            _isSecondaryDragging = false;
+        }
+        else
+        {
+            OnCancelled?.Invoke();
+            _isSecondaryPressed = false;
+        }
     }
 }

@@ -47,7 +47,7 @@ public class BuildingPlacement : MonoBehaviour
         playerInput.OnHorizontalTurn += TurnPreviewHorizontally;
         playerInput.OnFloorChanged += AdjustPlacementHeightToFloorChange;
         playerInput.OnCameraRotationStarted += FreezePreviewUpdate;
-        playerInput.OnCameraRotationReleased += UnfreezePreviewUpdate;
+        playerInput.OnCameraRotationStopped += UnfreezePreviewUpdate;
     }
 
     private void OnDisable()
@@ -58,7 +58,7 @@ public class BuildingPlacement : MonoBehaviour
         playerInput.OnHorizontalTurn -= TurnPreviewHorizontally;
         playerInput.OnFloorChanged -= AdjustPlacementHeightToFloorChange;
         playerInput.OnCameraRotationStarted -= FreezePreviewUpdate;
-        playerInput.OnCameraRotationReleased -= UnfreezePreviewUpdate;
+        playerInput.OnCameraRotationStopped -= UnfreezePreviewUpdate;
     }
 
     public void SelectBlockShape(Dictionary<Vector3Int, CellData> cellDataByPositions)
