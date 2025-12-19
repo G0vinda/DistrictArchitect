@@ -69,7 +69,7 @@ public class PlayerInput : ScriptableObject, Controls.IPlayerActions
 
     public void OnTurnHorizontally(InputAction.CallbackContext context)
     {
-        if (!context.performed)
+        if (!context.performed  || _isSecondaryDragging)
             return;
 
         var turnDirection = context.ReadValue<float>();
@@ -78,7 +78,7 @@ public class PlayerInput : ScriptableObject, Controls.IPlayerActions
 
     public void OnTurnVertically(InputAction.CallbackContext context)
     {
-        if (!context.performed)
+        if (!context.performed  || _isSecondaryDragging)
             return;
 
         var turnDirection = context.ReadValue<float>();
@@ -95,7 +95,7 @@ public class PlayerInput : ScriptableObject, Controls.IPlayerActions
 
     public void OnTurnCameraHorizontally(InputAction.CallbackContext context)
     {
-        if (!context.performed)
+        if (!context.performed  || _isSecondaryDragging)
             return;
         var turnDirection = context.ReadValue<float>();
         OnCameraTurn?.Invoke(turnDirection);
