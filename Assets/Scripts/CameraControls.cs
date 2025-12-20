@@ -3,6 +3,7 @@ using System.Collections;
 using System.Linq;
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Composites;
 
 public class CameraControls : MonoBehaviour
@@ -18,6 +19,7 @@ public class CameraControls : MonoBehaviour
     private int _currentRotationIndex;
     private float _startHeight;
     private Coroutine _dragCoroutine;
+    private Vector2 _previousMousePosition;
 
     public Action OnCameraSnappedInPlace;
 
@@ -77,6 +79,7 @@ public class CameraControls : MonoBehaviour
     private void StartCameraFreeRotation()
     {
         _dragCoroutine = StartCoroutine(Drag());
+        _previousMousePosition = Mouse.current.position.ReadValue();
         Cursor.lockState = CursorLockMode.Locked;
     }
 
@@ -97,14 +100,15 @@ public class CameraControls : MonoBehaviour
         _rotationTween.OnComplete(() =>
         {
             Cursor.lockState = CursorLockMode.None;
+            Mouse.current.WarpCursorPosition(_previousMousePosition);
             OnCameraSnappedInPlace?.Invoke();
         });
     }
 
     private IEnumerator Drag()
     {
-        var maxVerticalRotationAngle = 75f;
-        var minVerticalRotationAngle = 15f;
+        const float maxVerticalRotationAngle = 75f;
+        const float minVerticalRotationAngle = 15f;
         
         while (true)
         {
