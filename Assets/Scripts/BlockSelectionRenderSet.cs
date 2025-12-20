@@ -9,9 +9,9 @@ public class BlockSelectionRenderSet : MonoBehaviour
     [SerializeField] private RawImage renderTarget;
     [SerializeField] private Transform renderObjectParent;
 
-    private ShapeObject shapeObject;
-    
-    void Start()
+    public ShapeObject ShapeObject { get; private set; }
+
+    private void Start()
     {
         cam.targetTexture = renderTexture;
         renderTarget.texture = renderTexture;
@@ -20,11 +20,11 @@ public class BlockSelectionRenderSet : MonoBehaviour
 
     public void SetShape(Dictionary<Vector3Int, CellData> shapeDefinition)
     {
-        if (shapeObject != null)
-            Destroy(shapeObject.gameObject);
+        if (ShapeObject != null)
+            Destroy(ShapeObject.gameObject);
         
-        shapeObject = ShapeObjectGenerator.Instance.GenerateCentered(shapeDefinition);
-        shapeObject.transform.SetParent(renderObjectParent);
-        shapeObject.transform.position = renderObjectParent.position;
+        ShapeObject = ShapeObjectGenerator.Instance.GenerateCentered(shapeDefinition);
+        ShapeObject.transform.SetParent(renderObjectParent);
+        ShapeObject.transform.position = renderObjectParent.position;
     }
 }

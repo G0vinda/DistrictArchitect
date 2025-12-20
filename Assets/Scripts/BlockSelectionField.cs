@@ -8,7 +8,7 @@ using UnityEngine.EventSystems;
 public class BlockSelectionField : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
     [SerializeField] private CanvasGroup canvasGroup;
-    [SerializeField] private BlockSelectionRenderSet renderSet;
+    [SerializeField] internal BlockSelectionRenderSet renderSet;
     [SerializeField] private UnityEvent<BlockSelectionField> onBlockSelected;
     [SerializeField] private UnityEvent onHovered;
     

@@ -62,7 +62,7 @@ public class BuildingPlacement : MonoBehaviour
         cameraControls.OnCameraSnappedInPlace -= UnfreezePreviewUpdate;
     }
 
-    public void SelectBlockShape(Dictionary<Vector3Int, CellData> cellDataByPositions)
+    public void SelectBlockShape(Dictionary<Vector3Int, CellData> cellDataByPositions, int nRightRotations)
     {
         _blockYAdjustment = 0;
         
@@ -71,6 +71,11 @@ public class BuildingPlacement : MonoBehaviour
         
         _currentShapeObject = ShapeObjectGenerator.Instance.Generate(cellDataByPositions);
         _currentShapeObject.SetMaterialAlpha(previewMaterialAlpha);
+        for (int i = 0; i < nRightRotations; i++)
+        {
+            _currentShapeObject.Rotate90(Vector3Int.up, 1);
+        }
+        
         _currentShapeObject.Hide();
     }
 
@@ -207,7 +212,7 @@ public class BuildingPlacement : MonoBehaviour
 
     private void UnfreezePreviewUpdate()
     {
-        if (_lastHoveredGridCoordinates != null)
+        if (_lastHoveredGridCoordinates != null && _currentShapeObject)
         {
             var lastHoveredWorldPosition = Grid.GridCoordinatesToWorldPosition(_lastHoveredGridCoordinates.Value);
             lastHoveredWorldPosition -= new Vector3(0, Grid.CELL_SIZE/2, 0);
