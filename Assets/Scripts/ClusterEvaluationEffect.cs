@@ -137,7 +137,7 @@ public class ClusterEvaluationEffect : MonoBehaviour
         }
     }
 
-    private void AddDestroyBlockSequence(Sequence validationSequence, CellObject cell, float camEffektIntensity)
+    private void AddDestroyBlockSequence(Sequence validationSequence, Cell cell, float camEffektIntensity)
     {            
         validationSequence.AppendCallback(() => SetNewCameraAim(cell.transform.position));
         var speed = Mathf.Lerp(minScoreSpeed, maxScoreSpeed, camEffektIntensity);
@@ -149,7 +149,7 @@ public class ClusterEvaluationEffect : MonoBehaviour
         validationSequence.Append(_camera.DOShakePosition(camShakeDuration, Vector3.one * camShakeStrength));
     }
 
-    private void TransferValueToTotalScore(CellObject cell)
+    private void TransferValueToTotalScore(Cell cell)
     {
         var value = cell.GetValue();
         currentClusterScore -= value;

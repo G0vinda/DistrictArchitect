@@ -9,7 +9,7 @@ public class BlockSelectionRenderSet : MonoBehaviour
     [SerializeField] private RawImage renderTarget;
     [SerializeField] private Transform renderObjectParent;
 
-    public ShapeObject ShapeObject { get; private set; }
+    public Shape Shape { get; private set; }
 
     private void Start()
     {
@@ -18,13 +18,13 @@ public class BlockSelectionRenderSet : MonoBehaviour
         cam.gameObject.SetActive(true);
     }
 
-    public void SetShape(Dictionary<Vector3Int, CellData> shapeDefinition)
+    public void SetShape(Dictionary<Vector3Int, Building> shapeDefinition)
     {
-        if (ShapeObject != null)
-            Destroy(ShapeObject.gameObject);
+        if (Shape != null)
+            Destroy(Shape.gameObject);
         
-        ShapeObject = ShapeObjectGenerator.Instance.GenerateCentered(shapeDefinition);
-        ShapeObject.transform.SetParent(renderObjectParent);
-        ShapeObject.transform.position = renderObjectParent.position;
+        Shape = ShapeGenerator.Instance.GenerateCentered(shapeDefinition);
+        Shape.transform.SetParent(renderObjectParent);
+        Shape.transform.position = renderObjectParent.position;
     }
 }

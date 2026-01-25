@@ -14,9 +14,9 @@ public class BlockSelectionField : MonoBehaviour, IPointerClickHandler, IPointer
     
     private Tween scaleTween;
     
-    public Dictionary<Vector3Int, CellData> ShapeDefinition { get; private set; }
+    public Dictionary<Vector3Int, Building> ShapeDefinition { get; private set; }
 
-    public void SetShapeDefinition(Dictionary<Vector3Int, CellData> shapeDefinition)
+    public void SetShapeDefinition(Dictionary<Vector3Int, Building> shapeDefinition)
     {
         ShapeDefinition = shapeDefinition;
         renderSet.SetShape(ShapeDefinition);

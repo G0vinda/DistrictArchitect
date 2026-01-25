@@ -26,7 +26,7 @@ public class CellClusterSelector : MonoBehaviour
             return;
         
         var mouseRay = Camera.main!.ScreenPointToRay(playerInput.MousePosition);
-        if (!Physics.Raycast(mouseRay, out RaycastHit hit) || !hit.collider.gameObject.GetComponent<CellObject>())
+        if (!Physics.Raycast(mouseRay, out RaycastHit hit) || !hit.collider.gameObject.GetComponent<Cell>())
         {
             ResetHighlighting();
             return;

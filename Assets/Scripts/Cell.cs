@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-public class CellObject : MonoBehaviour
+public class Cell : MonoBehaviour
 {
     [field: SerializeField] public Collider Collider { get; private set; }
-    [SerializeField] private MeshRenderer meshRenderer;
+    [SerializeField] public MeshRenderer meshRenderer;
     [SerializeField] private ParticleSystem destroyVfxPrefab;
     
     private static readonly int ALPHA = Shader.PropertyToID("_Alpha");
@@ -17,18 +17,8 @@ public class CellObject : MonoBehaviour
 
     public static event Action<Vector3> CellObjectDestroyed;
     public static event Action<Vector3> CellObjectScored;
-
-    public CellData CellData
-    {
-        get => _cellData;
-        set
-        {
-            _cellData = value;
-            meshRenderer.material = _cellData.Material;
-        }
-    }
     
-    private CellData _cellData;
+    [SerializeField] public Building Building;
 
     public void SetAlpha(float alpha)
     {

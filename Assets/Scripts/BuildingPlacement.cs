@@ -18,7 +18,7 @@ public class BuildingPlacement : MonoBehaviour
     [SerializeField] private float previewMaterialAlpha = 0.6f;
     [SerializeField] private UnityEvent<int> floorChanged; 
     
-    public bool IsPlacing => _currentShapeObject != null;
+    public bool IsPlacing => currentShape != null;
     public Grid Grid { get; private set; }
     
     public Action<Vector3> PlacedBuilding;
@@ -29,7 +29,7 @@ public class BuildingPlacement : MonoBehaviour
     private Vector3Int? _lastHoveredGridCoordinates;
     private bool _placeable;
     private int _blockYAdjustment;
-    private ShapeObject _currentShapeObject;
+    private Shape currentShape;
     private bool _freezePreviewUpdate;
     
     private const float FLOOR_HEIGHT = 1f;
@@ -62,27 +62,27 @@ public class BuildingPlacement : MonoBehaviour
         cameraControls.OnCameraSnappedInPlace -= UnfreezePreviewUpdate;
     }
 
-    public void SelectBlockShape(Dictionary<Vector3Int, CellData> cellDataByPositions, int nRightRotations)
+    public void SelectBlockShape(Dictionary<Vector3Int, Building> cellDataByPositions, int nRightRotations)
     {
         _blockYAdjustment = 0;
         
-        if (_currentShapeObject)
-            Destroy(_currentShapeObject);
+        if (currentShape)
+            Destroy(currentShape);
         
-        _currentShapeObject = ShapeObjectGenerator.Instance.Generate(cellDataByPositions);
-        _currentShapeObject.SetMaterialAlpha(previewMaterialAlpha);
+        currentShape = ShapeGenerator.Instance.Generate(cellDataByPositions);
+        currentShape.SetMaterialAlpha(previewMaterialAlpha);
         for (int i = 0; i < nRightRotations; i++)
         {
-            _currentShapeObject.Rotate90(Vector3Int.up, 1);
+            currentShape.Rotate90(Vector3Int.up, 1);
         }
         
-        _currentShapeObject.Hide();
+        currentShape.Hide();
     }
 
     public void Unselect()
     {
-        if (_currentShapeObject)
-            Destroy(_currentShapeObject.gameObject);
+        if (currentShape)
+            Destroy(currentShape.gameObject);
     }
 
     private void AdjustPlacementHeightToFloorChange(float floorChange)
@@ -100,7 +100,7 @@ public class BuildingPlacement : MonoBehaviour
 
     private void CheckForEmptyBuildingSlotOnFloor(int floor, Vector2 mousePosition)
     {
-        if(!_currentShapeObject)
+        if(!currentShape)
             return;
 
         var floorY = floor * FLOOR_HEIGHT;
@@ -118,7 +118,7 @@ public class BuildingPlacement : MonoBehaviour
         {
             _lastHoveredGridCoordinates = null;
             _placeable = false;
-            _currentShapeObject.Hide();
+            currentShape.Hide();
             return;
         }
         
@@ -129,16 +129,16 @@ public class BuildingPlacement : MonoBehaviour
 
     private void UpdatePreview()
     {
-        if (!_currentShapeObject || !_lastHoveredGridCoordinates.HasValue)
+        if (!currentShape || !_lastHoveredGridCoordinates.HasValue)
             return;
         
         var hitArea = GetHitArea(_lastHoveredGridCoordinates.Value); 
         
-        _currentShapeObject.transform.position = Grid.GridCoordinatesToWorldPosition(_lastHoveredGridCoordinates.Value + Vector3Int.up * _blockYAdjustment);
-        _currentShapeObject.Show();
+        currentShape.transform.position = Grid.GridCoordinatesToWorldPosition(_lastHoveredGridCoordinates.Value + Vector3Int.up * _blockYAdjustment);
+        currentShape.Show();
 
         _placeable = Grid.CanShapeBePlacedAtArea(hitArea);
-        _currentShapeObject.SetMaterialToDisabled(!_placeable);
+        currentShape.SetMaterialToDisabled(!_placeable);
     }
 
     private void CheckForEmptyBuildingSlot(Vector2 mousePosition)
@@ -150,22 +150,22 @@ public class BuildingPlacement : MonoBehaviour
 
     private List<Vector3Int> GetHitArea(Vector3Int gridCoordinates)
     {
-        return _currentShapeObject.CellCoordinates.Select(coord => coord + gridCoordinates + _blockYAdjustment * Vector3Int.up).ToList();
+        return currentShape.CellCoordinates.Select(coord => coord + gridCoordinates + _blockYAdjustment * Vector3Int.up).ToList();
     }
 
     private void TryPlaceBuilding()
     {
-        if (!_placeable || !_currentShapeObject || !_lastHoveredGridCoordinates.HasValue) 
+        if (!_placeable || !currentShape || !_lastHoveredGridCoordinates.HasValue) 
             return;
 
         var finalShapeCoordinates = _lastHoveredGridCoordinates.Value + Vector3Int.up * _blockYAdjustment;
         var finalShapePosition = Grid.GridCoordinatesToWorldPosition(finalShapeCoordinates);
-        _currentShapeObject.transform.position = finalShapePosition;
-        var isGameOver = Grid.PlaceShapeAtPosition(_currentShapeObject, finalShapeCoordinates);
-        _currentShapeObject.SetMaterialAlpha(1.0f);
-        _currentShapeObject.EnableColliders();
+        currentShape.transform.position = finalShapePosition;
+        var isGameOver = Grid.PlaceShapeAtPosition(currentShape, finalShapeCoordinates);
+        currentShape.SetMaterialAlpha(1.0f);
+        currentShape.EnableColliders();
         PlayPlacementAnimation();
-        _currentShapeObject = null;
+        currentShape = null;
         
         PlacedBuilding?.Invoke(finalShapePosition);
         if(isGameOver) GameOver?.Invoke();
@@ -174,8 +174,8 @@ public class BuildingPlacement : MonoBehaviour
     private void PlayPlacementAnimation()
     {
         var placementAnimation = DOTween.Sequence();
-        _currentShapeObject.SetMaterialWhiteBlend(0.6f);
-        var animationShapeReference = _currentShapeObject;
+        currentShape.SetMaterialWhiteBlend(0.6f);
+        var animationShapeReference = currentShape;
         placementAnimation.Append(animationShapeReference.transform.DOScale(Vector3.one * 1.15f, 0.05f));
         placementAnimation.Append(animationShapeReference.transform.DOScale(Vector3.one * 1f, 0.15f).SetEase(Ease.OutSine));
         placementAnimation.Join(DOVirtual.Float(0.6f, 0f, 0.15f, value => animationShapeReference.SetMaterialWhiteBlend(value))
@@ -185,16 +185,16 @@ public class BuildingPlacement : MonoBehaviour
     private void TurnPreviewHorizontally(float turnDirection)
     {
         Debug.Log("Should be Turning Preview Horizontally");
-        if (!_currentShapeObject)
+        if (!currentShape)
             return;
         
-        _currentShapeObject.Rotate90(Vector3Int.up, Mathf.RoundToInt(turnDirection));
+        currentShape.Rotate90(Vector3Int.up, Mathf.RoundToInt(turnDirection));
         UpdatePreview();
     }
 
     private void TurnPreviewVertically(float turnDirection)
     {
-        if (!_currentShapeObject)
+        if (!currentShape)
             return;
         
         turnDirection *= -1;
@@ -202,8 +202,8 @@ public class BuildingPlacement : MonoBehaviour
         var cameraAngle = camControls.CurrentRotationEulers.y;
         var axis = Vector3Int.left.Rotate90(Vector3Int.up, 
             Mathf.RoundToInt(cameraAngle / 90));
-        _currentShapeObject.Rotate90(axis, Mathf.RoundToInt(turnDirection));
-        var minY = _currentShapeObject.CellCoordinates.Min(coord => coord.y);
+        currentShape.Rotate90(axis, Mathf.RoundToInt(turnDirection));
+        var minY = currentShape.CellCoordinates.Min(coord => coord.y);
         _blockYAdjustment = -minY;
         UpdatePreview();
     }
@@ -212,7 +212,7 @@ public class BuildingPlacement : MonoBehaviour
 
     private void UnfreezePreviewUpdate()
     {
-        if (_lastHoveredGridCoordinates != null && _currentShapeObject)
+        if (_lastHoveredGridCoordinates != null && currentShape)
         {
             var lastHoveredWorldPosition = Grid.GridCoordinatesToWorldPosition(_lastHoveredGridCoordinates.Value);
             lastHoveredWorldPosition -= new Vector3(0, Grid.CELL_SIZE/2, 0);

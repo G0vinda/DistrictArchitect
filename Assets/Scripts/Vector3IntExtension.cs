@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public static class Vector3IntExtension
@@ -62,5 +63,19 @@ public static class Vector3IntExtension
         }
 
         throw new ArgumentException($"{v} is not an unit axis vector!");
+    }
+
+    public static List<Vector3Int> Neighbours(this Vector3Int v)
+    {
+        var neighbours = new List<Vector3Int>
+        {
+            v + Vector3Int.up,
+            v + Vector3Int.down,
+            v + Vector3Int.left,
+            v + Vector3Int.right,
+            v + Vector3Int.forward,
+            v + Vector3Int.back
+        };
+        return neighbours;
     }
 }

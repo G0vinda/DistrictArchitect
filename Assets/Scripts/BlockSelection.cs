@@ -52,7 +52,7 @@ public class BlockSelection : MonoBehaviour
         if (_selectedField != null)
             _selectedField.SetHighlight(false);
         selectionField.SetHighlight(true);
-        var rotation = selectionField.renderSet.ShapeObject.transform.rotation.eulerAngles;
+        var rotation = selectionField.renderSet.Shape.transform.rotation.eulerAngles;
         var nRightRotations = Mathf.RoundToInt(rotation.y/90);
             
         buildingPlacement.SelectBlockShape(selectionField.ShapeDefinition, nRightRotations);

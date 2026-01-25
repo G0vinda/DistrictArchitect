@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Grid
 {
-    private readonly Dictionary<Vector3Int, CellObject> grid = new();
+    private readonly Dictionary<Vector3Int, Cell> grid = new();
 
     public const int MAP_SIZE = 5;
     public const float CELL_SIZE = 1f;
@@ -53,7 +53,7 @@ public class Grid
             coordinates.z * CELL_SIZE + BLOCK_OFFSET);
     }
 
-    public bool PlaceShapeAtPosition(ShapeObject shape, Vector3Int position)
+    public bool PlaceShapeAtPosition(Shape shape, Vector3Int position)
     {
         var doesPlacementFinishGame = false;
         foreach (var (localCoordinate, cell) in shape.CellsByCoordinate)
@@ -62,10 +62,59 @@ public class Grid
             if (gridCoordinate.y >= (GAME_OVER_HEIGHT-1)) doesPlacementFinishGame = true;
             grid[gridCoordinate] = cell;
         }
+
+        UpdateBuildingStates();
+        
         return doesPlacementFinishGame;
     }
 
-    public List<CellObject> GetAllCellObjects()
+    private void UpdateBuildingStates()
+    {
+        foreach (var (coordinate, cell) in grid)
+        {
+            if (cell == null) continue;
+            
+            var residentialBuilding = cell.Building as ResidentialBuilding;
+            if (residentialBuilding == null || residentialBuilding.IsAtFullCapacity)
+                continue;
+
+            var searchQueue = new Queue<Vector3Int>(coordinate.Neighbours());
+            var visited = new HashSet<Vector3Int>() { coordinate };
+            while (!residentialBuilding.IsAtFullCapacity && searchQueue.Count > 0)
+            {
+                var searchCoordinate = searchQueue.Dequeue();
+                if (!grid.ContainsKey(searchCoordinate) 
+                    || grid[searchCoordinate] == null 
+                    || !visited.Add(searchCoordinate))
+                    continue;
+
+                switch (grid[searchCoordinate].Building)
+                {
+                    case FoodBuilding foodBuilding:
+                        var foodNeeded = residentialBuilding.MaximumCapacity - residentialBuilding.NumberOfResidents;
+                        var transferCount = Mathf.Min(foodNeeded, foodBuilding.AmountOfFoodLeft);
+                        residentialBuilding.NumberOfResidents += transferCount;
+                        foodBuilding.AmountOfFoodLeft -= transferCount;
+                        Debug.Log("Residential Building at " + coordinate +
+                                  " was supplied with food and now has " + residentialBuilding.NumberOfResidents +
+                                  " residents.");
+                        break;
+                    case InfrastructureBuilding:
+                        foreach (var neighbour in 
+                                 searchCoordinate.Neighbours()
+                                     .Where(neighbour => !visited.Contains(neighbour)))
+                        {
+                            searchQueue.Enqueue(neighbour);
+                        }
+                        break;
+                }
+            }
+        }
+    }
+    
+    
+
+    public List<Cell> GetAllCellObjects()
     {
         return grid.Values.Where(cell => cell != null).ToList();
     }
@@ -75,7 +124,7 @@ public class Grid
         return grid.Keys.Where(coord => grid[coord] != null).ToList();
     }
 
-    public CellObject GetCellObjectAtCoordinates(Vector3Int coordinates)
+    public Cell GetCellObjectAtCoordinates(Vector3Int coordinates)
     {
         return grid[coordinates];
     }
@@ -91,7 +140,7 @@ public class Grid
         var clusterCoordinates = new List<Vector3Int>() {startCoordinate};
         var directions = new[]
             { Vector3Int.up, Vector3Int.down, Vector3Int.right, Vector3Int.left, Vector3Int.forward, Vector3Int.back };
-        var clusterData = grid[startCoordinate].CellData;
+        var clusterData = grid[startCoordinate].Building;
 
         while (openCoordinates.Count > 0)
         {
@@ -105,7 +154,7 @@ public class Grid
                 if (!IsCoordinateInGrid(neighbor))
                     continue;
                 
-                if (grid[neighbor] == null || grid[neighbor].CellData != clusterData)
+                if (grid[neighbor] == null || grid[neighbor].Building != clusterData)
                     continue;
                 
                 clusterCoordinates.Add(neighbor);

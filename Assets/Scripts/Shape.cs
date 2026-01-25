@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class ShapeObject : MonoBehaviour
+public class Shape : MonoBehaviour
 {
-    public Dictionary<Vector3Int, CellObject> CellsByCoordinate { get; private set; } = new();
-    public List<CellObject> Cells => CellsByCoordinate.Values.ToList();
+    public Dictionary<Vector3Int, Cell> CellsByCoordinate { get; private set; } = new();
+    public List<Cell> Cells => CellsByCoordinate.Values.ToList();
     public List<Vector3Int> CellCoordinates => CellsByCoordinate.Keys.ToList();
 
     private Quaternion _desiredRotation = Quaternion.identity;
@@ -20,7 +20,7 @@ public class ShapeObject : MonoBehaviour
     public void Rotate90(Vector3Int axis, int turnDirection)
     {
         Debug.Log("Rotate90 called on shapeObject");
-        var rotatedCellsByCoordinates = new Dictionary<Vector3Int, CellObject>();
+        var rotatedCellsByCoordinates = new Dictionary<Vector3Int, Cell>();
         foreach (var (coord, cell) in CellsByCoordinate)
         {
             rotatedCellsByCoordinates.Add(coord.Rotate90(axis, turnDirection), cell);

@@ -25,14 +25,14 @@ public class AudioManager : MonoBehaviour
     private void OnEnable()
     {
         buildingPlacement.PlacedBuilding += OnPlacedBuilding;
-        CellObject.CellObjectDestroyed += OnCellDestroyed;
-        CellObject.CellObjectScored += OnCellScored;
+        Cell.CellObjectDestroyed += OnCellDestroyed;
+        Cell.CellObjectScored += OnCellScored;
     }
     
     private void OnDisable()
     {
         buildingPlacement.PlacedBuilding -= OnPlacedBuilding;
-        CellObject.CellObjectDestroyed -= OnCellDestroyed;
+        Cell.CellObjectDestroyed -= OnCellDestroyed;
     }
 
     public void OnCellDestroyed(Vector3 destroyPosition)

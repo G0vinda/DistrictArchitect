@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class ShapeManager : MonoBehaviour
 {
     private List<List<Vector3Int>> _shapes = new();
 
-    [SerializeField] private CellData[] cellData;
+    [SerializeField] private Building[] buildings;
     
     private void Awake()
     {
@@ -28,29 +29,29 @@ public class ShapeManager : MonoBehaviour
         _shapes.Add(tripodShape);
     }
 
-    public Dictionary<Vector3Int, CellData> GetRandomShapeDefinition()
+    public Dictionary<Vector3Int, Building> GetRandomShapeDefinition()
     {
-        var cellDataList = cellData.ToList();
-        var cellData1 = cellDataList[Random.Range(0, cellDataList.Count)];
-        cellDataList.Remove(cellData1);
-        var cellData2 = cellDataList[Random.Range(0, cellDataList.Count)];
+        var buildingList = buildings.ToList();
+        var building1 = buildingList[Random.Range(0, buildingList.Count)];
+        buildingList.Remove(building1);
+        var building2 = buildingList[Random.Range(0, buildingList.Count)];
         var cellCoordinates = new List<Vector3Int>(_shapes[Random.Range(0, _shapes.Count)]);
         
-        var cellDataByCoordinates = new Dictionary<Vector3Int, CellData>();
+        var buildingByCoordinates = new Dictionary<Vector3Int, Building>();
         var coords = cellCoordinates[Random.Range(0, cellCoordinates.Count)];
         cellCoordinates.Remove(coords);
-        cellDataByCoordinates.Add(coords, cellData1);
+        buildingByCoordinates.Add(coords, building1);
         coords = cellCoordinates[Random.Range(0, cellCoordinates.Count)];
         cellCoordinates.Remove(coords);
-        cellDataByCoordinates.Add(coords, cellData2);
+        buildingByCoordinates.Add(coords, building2);
 
         while (cellCoordinates.Count > 0)
         {
             coords = cellCoordinates[Random.Range(0, cellCoordinates.Count)];
             cellCoordinates.Remove(coords);
-            cellDataByCoordinates.Add(coords, Random.Range(0, 2) == 0 ? cellData1 : cellData2);
+            buildingByCoordinates.Add(coords, Random.Range(0, 2) == 0 ? building1 : building2);
         }
 
-        return cellDataByCoordinates;
+        return buildingByCoordinates;
     }
 }

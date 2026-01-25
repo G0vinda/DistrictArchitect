@@ -1,19 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Serialization;
 
-public class ShapeObjectGenerator : MonoBehaviour
+public class ShapeGenerator : MonoBehaviour
 {
-    [SerializeField] private CellObject cellObjectPrefab;
-    
-    public static ShapeObjectGenerator Instance;
+    public static ShapeGenerator Instance;
 
     private void Awake()
     {
         Instance = this;
     }
 
-    public ShapeObject GenerateCentered(Dictionary<Vector3Int, CellData> cellDataByCoordinates)
+    public Shape GenerateCentered(Dictionary<Vector3Int, Building> cellDataByCoordinates)
     {
         var blockPositions = cellDataByCoordinates.Keys;
         var centerX = Mathf.Lerp(blockPositions.Min(pos => pos.x), blockPositions.Max(pos => pos.x), .5f);
@@ -24,7 +23,7 @@ public class ShapeObjectGenerator : MonoBehaviour
         return Generate(cellDataByCoordinates, meshBoundCenter);
     }
 
-    public ShapeObject Generate(Dictionary<Vector3Int, CellData> cellDataByCoordinates, Vector3 customCenter = default)
+    public Shape Generate(Dictionary<Vector3Int, Building> buildingByCoordinates, Vector3 customCenter = default)
     {
         var go = new GameObject
         {
@@ -34,14 +33,15 @@ public class ShapeObjectGenerator : MonoBehaviour
                 rotation = Quaternion.identity,
             }
         };
-        var shapeObject = go.AddComponent<ShapeObject>();
+        var shapeObject = go.AddComponent<Shape>();
         
-        foreach (var (coordinates, cellData) in cellDataByCoordinates)
+        foreach (var (coordinates, building) in buildingByCoordinates)
         {
             var position = shapeObject.transform.position + (Vector3)coordinates * Grid.CELL_SIZE - customCenter;
-            var newCellObject = Instantiate(cellObjectPrefab, position, Quaternion.identity, shapeObject.transform);
-            newCellObject.CellData = cellData;
-            shapeObject.CellsByCoordinate.Add(coordinates, newCellObject);
+            var newBuilding = Instantiate(building, position, Quaternion.identity, shapeObject.transform);
+            var cell = newBuilding.gameObject.GetComponent<Cell>();
+            cell.meshRenderer.material = building.Material;
+            shapeObject.CellsByCoordinate.Add(coordinates, cell);
         }
         return shapeObject;
     }
