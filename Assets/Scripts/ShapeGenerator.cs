@@ -40,8 +40,11 @@ public class ShapeGenerator : MonoBehaviour
             var position = shapeObject.transform.position + (Vector3)coordinates * Grid.CELL_SIZE - customCenter;
             var newBuilding = Instantiate(building, position, Quaternion.identity, shapeObject.transform);
             var cell = newBuilding.gameObject.GetComponent<Cell>();
-            cell.meshRenderer.material = building.Material;
             shapeObject.CellsByCoordinate.Add(coordinates, cell);
+            if (newBuilding.TryGetComponent<FoodBuilding>(out var foodBuilding))
+            {
+                newBuilding.GetComponent<DebugBalls>().Count = foodBuilding.AmountOfFoodLeft;
+            }
         }
         return shapeObject;
     }

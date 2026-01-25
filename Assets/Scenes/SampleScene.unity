@@ -1523,7 +1523,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec51530391a845aeb6c5120600247419, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cellPrefab: {fileID: 2721046774980866411, guid: 141f90602e615e4478cba362096d2b92, type: 3}
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0

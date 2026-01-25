@@ -94,7 +94,9 @@ public class Grid
                         var foodNeeded = residentialBuilding.MaximumCapacity - residentialBuilding.NumberOfResidents;
                         var transferCount = Mathf.Min(foodNeeded, foodBuilding.AmountOfFoodLeft);
                         residentialBuilding.NumberOfResidents += transferCount;
+                        residentialBuilding.GetComponent<DebugBalls>().Count = residentialBuilding.NumberOfResidents;
                         foodBuilding.AmountOfFoodLeft -= transferCount;
+                        foodBuilding.GetComponent<DebugBalls>().Count = foodBuilding.AmountOfFoodLeft;
                         Debug.Log("Residential Building at " + coordinate +
                                   " was supplied with food and now has " + residentialBuilding.NumberOfResidents +
                                   " residents.");

@@ -22,22 +22,22 @@ public class Cell : MonoBehaviour
 
     public void SetAlpha(float alpha)
     {
-        meshRenderer.material.SetFloat(ALPHA, alpha);
+        //meshRenderer.material.SetFloat(ALPHA, alpha);
     }
 
     public void SetWhiteBlend(float whiteBlend)
     {
-        meshRenderer.material.SetFloat(WHITE_BLEND, whiteBlend);
+        //meshRenderer.material.SetFloat(WHITE_BLEND, whiteBlend);
     }
 
     public void SetDisabled(bool disabled)
     {
-        meshRenderer.material.SetFloat(DISABLED, disabled ? 1 : 0);
+        //meshRenderer.material.SetFloat(DISABLED, disabled ? 1 : 0);
     }
 
     public void SetCastShadows(bool castShadows)
     {
-        meshRenderer.shadowCastingMode = castShadows ? ShadowCastingMode.On : ShadowCastingMode.Off;
+        //meshRenderer.shadowCastingMode = castShadows ? ShadowCastingMode.On : ShadowCastingMode.Off;
     }
 
     public void DestroyWithVfx()
