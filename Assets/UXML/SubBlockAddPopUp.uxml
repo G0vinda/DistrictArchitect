@@ -1,0 +1,8 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <ui:VisualElement style="flex-grow: 1;">
+        <ui:Label text="Add new SubBlock" style="align-items: flex-start; font-size: 16px; -unity-text-align: upper-left; -unity-font-style: bold; margin-bottom: 10px;" />
+        <uie:ObjectField label="Prefab" name="PrefabField" />
+        <ui:Vector3IntField label="Position" name="PositionField" />
+    </ui:VisualElement>
+    <ui:Button text="Add" name="AddButton" style="min-height: 30px;" />
+</ui:UXML>
