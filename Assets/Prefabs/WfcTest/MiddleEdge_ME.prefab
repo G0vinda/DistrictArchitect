@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9128454275499479500}
   m_Layer: 0
-  m_Name: MiddleEdge
+  m_Name: MiddleEdge_ME
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

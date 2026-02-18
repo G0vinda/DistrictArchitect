@@ -17,6 +17,7 @@ namespace WFC
         private ObjectField _prefabField;
         private EnumField _typeField;
         private FloatField _probabilityField;
+        private Label _couldNotReadTypeLabel;
         private VisualElement _imageContainer;
         private Image _currentPreviewImage;
 
@@ -37,12 +38,18 @@ namespace WFC
             _prefabField.RegisterCallback<ChangeEvent<Object>>(OnPrefabChanged);
             _typeField = rootVisualElement.Q<EnumField>("TypeField");
             _probabilityField = rootVisualElement.Q<FloatField>("ProbabilityField");
+            
+            _couldNotReadTypeLabel = rootVisualElement.Q<Label>("CouldNotReadTypeLabel");
+            _imageContainer = rootVisualElement.Q<VisualElement>("ImageContainer");
         }
 
         private void OnPrefabChanged(ChangeEvent<Object> evt)
         {
             if (_currentPreviewImage != null)
+            {
                 _imageContainer.Remove(_currentPreviewImage);
+                _currentPreviewImage = null;
+            }
             if (evt.newValue != null)
             {
                 var prefabPreviewTexture = GetPrefabPreviewTexture((GameObject)evt.newValue);
@@ -59,9 +66,21 @@ namespace WFC
                     tintColor = Color.white
                 };
 
-                _imageContainer = rootVisualElement.Q<VisualElement>("ImageContainer");
+                if (SubBlockUtils.TryExtractSubBlockTypeFromName(((GameObject)_prefabField.value).name,
+                        out var subBlockType))
+                {
+                    _typeField.value = subBlockType;
+                }
+                else
+                {
+                    _couldNotReadTypeLabel.style.display = DisplayStyle.Flex;
+                }
                 _imageContainer.Add(_currentPreviewImage);
                 _addSubBlockButton.SetEnabled(true);
+            }
+            else
+            {
+                _couldNotReadTypeLabel.style.display = DisplayStyle.None;
             }
             _addSubBlockButton.text = ADD_TEXT;
         }

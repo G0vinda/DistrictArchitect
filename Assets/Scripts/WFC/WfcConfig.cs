@@ -17,12 +17,7 @@ namespace WFC
         [SerializeField] private SubBlockType[] serializedTypes;
         [SerializeField] private GameObject[] serializedPrefabs;
         [SerializeField] private float[] serializedProbabilities;
-        [SerializeField] private string[] serializedPositiveZNeighbors;
-        [SerializeField] private string[] serializedNegativeZNeighbors;
-        [SerializeField] private string[] serializedPositiveXNeighbors;
-        [SerializeField] private string[] serializedNegativeXNeighbors;
-        [SerializeField] private string[] serializedPositiveYNeighbors;
-        [SerializeField] private string[] serializedNegativeYNeighbors;
+        [SerializeField] private SerializedAllowedNeighborArrays[] serializedNeighborArrays;
 
         private const int ID_COLUMN_INDEX = 0;
         private const int TYPE_COLUMN_INDEX = 1;
@@ -63,12 +58,7 @@ namespace WFC
             serializedTypes = new SubBlockType[rowCount];
             serializedPrefabs = new GameObject[rowCount];
             serializedProbabilities = new float[rowCount];
-            serializedPositiveZNeighbors = new string[rowCount];
-            serializedNegativeZNeighbors = new string[rowCount];
-            serializedPositiveXNeighbors = new string[rowCount];
-            serializedNegativeXNeighbors = new string[rowCount];
-            serializedPositiveYNeighbors = new string[rowCount];
-            serializedNegativeYNeighbors = new string[rowCount];
+            serializedNeighborArrays = new SerializedAllowedNeighborArrays[rowCount];
             
             for (var i = 0; i < subBlockTable.Rows.Count; i++)
             {
@@ -76,12 +66,15 @@ namespace WFC
                 serializedTypes[i] = (SubBlockType)subBlockTable.Rows[i][TYPE_COLUMN_INDEX];
                 serializedPrefabs[i] = (GameObject)subBlockTable.Rows[i][PREFAB_COLUMN_INDEX];
                 serializedProbabilities[i] = (float)subBlockTable.Rows[i][PROBABILITY_COLUMN_INDEX];
-                serializedPositiveZNeighbors[i] = JsonUtility.ToJson(subBlockTable.Rows[i][POSITIVE_Z_NEIGHBOR_COLUMN_INDEX]);
-                serializedNegativeZNeighbors[i] = JsonUtility.ToJson(subBlockTable.Rows[i][NEGATIVE_Z_NEIGHBOR_COLUMN_INDEX]);
-                serializedPositiveXNeighbors[i] = JsonUtility.ToJson(subBlockTable.Rows[i][POSITIVE_X_NEIGHBOR_COLUMN_INDEX]);
-                serializedNegativeXNeighbors[i] = JsonUtility.ToJson(subBlockTable.Rows[i][NEGATIVE_X_NEIGHBOR_COLUMN_INDEX]);
-                serializedPositiveYNeighbors[i] = JsonUtility.ToJson(subBlockTable.Rows[i][POSITIVE_Y_NEIGHBOR_COLUMN_INDEX]);
-                serializedNegativeYNeighbors[i] = JsonUtility.ToJson(subBlockTable.Rows[i][NEGATIVE_Y_NEIGHBOR_COLUMN_INDEX]);
+                serializedNeighborArrays[i] = new SerializedAllowedNeighborArrays
+                {
+                    positiveZ = (int[])subBlockTable.Rows[i][POSITIVE_Z_NEIGHBOR_COLUMN_INDEX],
+                    negativeZ = (int[])subBlockTable.Rows[i][NEGATIVE_Z_NEIGHBOR_COLUMN_INDEX],
+                    positiveX = (int[])subBlockTable.Rows[i][POSITIVE_X_NEIGHBOR_COLUMN_INDEX],
+                    negativeX = (int[])subBlockTable.Rows[i][NEGATIVE_X_NEIGHBOR_COLUMN_INDEX],
+                    positiveY = (int[])subBlockTable.Rows[i][POSITIVE_Y_NEIGHBOR_COLUMN_INDEX],
+                    negativeY = (int[])subBlockTable.Rows[i][NEGATIVE_Y_NEIGHBOR_COLUMN_INDEX]
+                };
             }
 
             tableUpdated = false;
@@ -112,12 +105,12 @@ namespace WFC
                 row[TYPE_COLUMN_INDEX] = serializedTypes[i];
                 row[PREFAB_COLUMN_INDEX] = serializedPrefabs[i];
                 row[PROBABILITY_COLUMN_INDEX] = serializedProbabilities[i];
-                row[POSITIVE_Z_NEIGHBOR_COLUMN_INDEX] = JsonUtility.FromJson<int[]>(serializedPositiveZNeighbors[i]);
-                row[NEGATIVE_Z_NEIGHBOR_COLUMN_INDEX] = JsonUtility.FromJson<int[]>(serializedNegativeZNeighbors[i]);
-                row[POSITIVE_X_NEIGHBOR_COLUMN_INDEX] = JsonUtility.FromJson<int[]>(serializedPositiveXNeighbors[i]);
-                row[NEGATIVE_X_NEIGHBOR_COLUMN_INDEX] = JsonUtility.FromJson<int[]>(serializedNegativeXNeighbors[i]);
-                row[POSITIVE_Y_NEIGHBOR_COLUMN_INDEX] = JsonUtility.FromJson<int[]>(serializedPositiveYNeighbors[i]);
-                row[NEGATIVE_Y_NEIGHBOR_COLUMN_INDEX] = JsonUtility.FromJson<int[]>(serializedNegativeYNeighbors[i]);
+                row[POSITIVE_Z_NEIGHBOR_COLUMN_INDEX] = serializedNeighborArrays[i].positiveZ;
+                row[NEGATIVE_Z_NEIGHBOR_COLUMN_INDEX] = serializedNeighborArrays[i].negativeZ;
+                row[POSITIVE_X_NEIGHBOR_COLUMN_INDEX] = serializedNeighborArrays[i].positiveX;
+                row[NEGATIVE_X_NEIGHBOR_COLUMN_INDEX] = serializedNeighborArrays[i].negativeX;
+                row[POSITIVE_Y_NEIGHBOR_COLUMN_INDEX] = serializedNeighborArrays[i].positiveY;
+                row[NEGATIVE_Y_NEIGHBOR_COLUMN_INDEX] = serializedNeighborArrays[i].negativeY;
                 subBlockTable.Rows.Add(row);
             }
         }
@@ -214,12 +207,7 @@ namespace WFC
                    serializedTypes == null ||
                    serializedPrefabs == null ||
                    serializedProbabilities == null ||
-                   serializedPositiveZNeighbors == null ||
-                   serializedNegativeZNeighbors == null ||
-                   serializedPositiveXNeighbors == null ||
-                   serializedNegativeXNeighbors == null ||
-                   serializedPositiveYNeighbors == null ||
-                   serializedNegativeYNeighbors == null;
+                   serializedNeighborArrays == null;
         }
 
         private bool AreAllSerializedArraysTheSameLength()
@@ -227,12 +215,7 @@ namespace WFC
             return serializedIds.Length == serializedTypes.Length &&
                    serializedIds.Length == serializedPrefabs.Length &&
                    serializedIds.Length == serializedProbabilities.Length &&
-                   serializedIds.Length == serializedPositiveZNeighbors.Length &&
-                   serializedIds.Length == serializedNegativeZNeighbors.Length &&
-                   serializedIds.Length == serializedPositiveXNeighbors.Length &&
-                   serializedIds.Length == serializedNegativeXNeighbors.Length &&
-                   serializedIds.Length == serializedPositiveYNeighbors.Length &&
-                   serializedIds.Length == serializedNegativeYNeighbors.Length;
+                   serializedIds.Length == serializedNeighborArrays.Length;
         }
 
         [ContextMenu("Print All SubBlocks")]
@@ -242,6 +225,17 @@ namespace WFC
             {
                 Debug.Log($"{row[ID_COLUMN_INDEX]}, {(SubBlockType)row[TYPE_COLUMN_INDEX]}: {((GameObject)row[PREFAB_COLUMN_INDEX]).name}");
             }
+        }
+
+        [Serializable]
+        private class SerializedAllowedNeighborArrays
+        {
+            public int[] positiveZ;
+            public int[] negativeZ;
+            public int[] positiveX;
+            public int[] negativeX;
+            public int[] positiveY;
+            public int[] negativeY;
         }
     }
 }
