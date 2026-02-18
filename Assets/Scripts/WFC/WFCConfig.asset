@@ -12,14 +12,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ddea6baa848c573469c580761a130fd5, type: 3}
   m_Name: WFCConfig
   m_EditorClassIdentifier: 
-  serializedSubBlocks:
-    positions:
-    - {x: -1, y: 0, z: -1}
-    - {x: 0, y: 0, z: 1}
-    blocksById:
-    - ids: d6030000
-      blocks:
-      - SubBlock_982
-    - ids: c6020000
-      blocks:
-      - SubBlock_710
+  serializedIds: 000000000100000002000000
+  serializedTypes: 010000000000000003000000
+  serializedPrefabs:
+  - {fileID: 3353048025843706249, guid: 3870de9ec63215b4c940b7f8e354035a, type: 3}
+  - {fileID: 12925780906203339, guid: e12bd0532d57ea146b5e38067f94446b, type: 3}
+  - {fileID: 3475895574349975713, guid: 70c8d0ce7e9d3b5469b6dbb90048d84b, type: 3}
+  serializedProbabilities:
+  - 1
+  - 1
+  - 1
+  serializedPositiveZNeighbors:
+  - '{}'
+  - '{}'
+  - '{}'
+  serializedNegativeZNeighbors:
+  - '{}'
+  - '{}'
+  - '{}'
+  serializedPositiveXNeighbors:
+  - '{}'
+  - '{}'
+  - '{}'
+  serializedNegativeXNeighbors:
+  - '{}'
+  - '{}'
+  - '{}'
+  serializedPositiveYNeighbors:
+  - '{}'
+  - '{}'
+  - '{}'
+  serializedNegativeYNeighbors:
+  - '{}'
+  - '{}'
+  - '{}'

@@ -2,7 +2,11 @@
     <ui:VisualElement style="flex-grow: 1;">
         <ui:Label text="Add new SubBlock" style="align-items: flex-start; font-size: 16px; -unity-text-align: upper-left; -unity-font-style: bold; margin-bottom: 10px;" />
         <uie:ObjectField label="Prefab" name="PrefabField" />
-        <ui:Vector3IntField label="Position" name="PositionField" />
+        <ui:VisualElement style="flex-grow: 1; flex-direction: row; max-height: 24px;">
+            <ui:EnumField label="Type" value="TopCorner" type="WFC.SubBlockType, ScriptsAssembly" data-source-type="WFC.SubBlockType, ScriptsAssembly" name="TypeField" style="align-items: center;" />
+            <ui:FloatField label="Probability" value="1" name="ProbabilityField" password="false" style="align-items: center;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="ImageContainer" style="flex-grow: 1; align-items: center; margin-top: 10px; margin-bottom: 10px;" />
     </ui:VisualElement>
     <ui:Button text="Add" name="AddButton" style="min-height: 30px;" />
 </ui:UXML>

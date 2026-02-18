@@ -6,6 +6,7 @@ MonoImporter:
   defaultReferences:
   - m_ViewDataDictionary: {instanceID: 0}
   - visualTree: {fileID: 9197481963319205126, guid: c9333da0a76ea2c43b070cfcc477820f, type: 3}
+  - axesIconTexture: {fileID: 2800000, guid: 053834551e792bd408a5a8c190f74166, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

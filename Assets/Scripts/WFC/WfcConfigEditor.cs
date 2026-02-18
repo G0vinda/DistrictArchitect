@@ -10,23 +10,34 @@ namespace WFC
     {
         [SerializeField] private VisualTreeAsset visualTree;
 
-        private Button _testButton;
+        private Button _addSubBlockButton;
+        private Label _subBlockCountText;
+        private VisualElement _root;
         
         public override VisualElement CreateInspectorGUI()
         {
-            var root = new VisualElement();
+            _root = new VisualElement();
 
-            visualTree.CloneTree(root);
+            visualTree.CloneTree(_root);
             
-            _testButton = root.Q<Button>("TestButton");
-            _testButton.RegisterCallback<ClickEvent>(OnButtonClick);
+            _addSubBlockButton = _root.Q<Button>("AddSubBlockButton");
+            _addSubBlockButton.RegisterCallback<ClickEvent>(OnButtonClick);
+
+            _subBlockCountText = _root.Q<Label>("SubBlockCountText");
+            _subBlockCountText.text = $"SubBlocks added: {((WfcConfig)target).GetSubBlockCount()}";
             
-            return root;
+            return _root;
+        }
+
+        public override void OnInspectorGUI()
+        {
+            _subBlockCountText = _root.Q<Label>("SubBlockCountText");
+            _subBlockCountText.text = $"SubBlocks added: {((WfcConfig)target).GetSubBlockCount()}";
         }
 
         private void OnButtonClick(ClickEvent evt)
         {
-            var popUp = EditorWindow.CreateInstance<SubBlockAddWindow>();
+            var popUp = CreateInstance<SubBlockAddWindow>();
             popUp.WfcConfig = (WfcConfig)target;
             popUp.Show();
         }

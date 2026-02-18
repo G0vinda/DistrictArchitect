@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -8,106 +10,237 @@ namespace WFC
     [CreateAssetMenu(fileName = "WFCConfig", menuName = "WFCConfig", order = 0)]
     public class WfcConfig : ScriptableObject, ISerializationCallbackReceiver
     {
-        [SerializeField] private SerializableSubBlocksByPositionDictionary serializedSubBlocks;
+        private DataTable subBlockTable;
+        private bool tableUpdated = true;
 
-        [NonSerialized]
-        public Dictionary<Vector3Int, Dictionary<uint, GameObject>> SubBlocks = new();
+        [SerializeField] private int[] serializedIds;
+        [SerializeField] private SubBlockType[] serializedTypes;
+        [SerializeField] private GameObject[] serializedPrefabs;
+        [SerializeField] private float[] serializedProbabilities;
+        [SerializeField] private string[] serializedPositiveZNeighbors;
+        [SerializeField] private string[] serializedNegativeZNeighbors;
+        [SerializeField] private string[] serializedPositiveXNeighbors;
+        [SerializeField] private string[] serializedNegativeXNeighbors;
+        [SerializeField] private string[] serializedPositiveYNeighbors;
+        [SerializeField] private string[] serializedNegativeYNeighbors;
 
-        [SerializeField] private uint nextSubBlockId = 0;
+        private const int ID_COLUMN_INDEX = 0;
+        private const int TYPE_COLUMN_INDEX = 1;
+        private const int PREFAB_COLUMN_INDEX = 2;
+        private const int PROBABILITY_COLUMN_INDEX = 3;
+        private const int POSITIVE_Z_NEIGHBOR_COLUMN_INDEX = 4;
+        private const int NEGATIVE_Z_NEIGHBOR_COLUMN_INDEX = 5;
+        private const int POSITIVE_X_NEIGHBOR_COLUMN_INDEX = 6;
+        private const int NEGATIVE_X_NEIGHBOR_COLUMN_INDEX = 7;
+        private const int POSITIVE_Y_NEIGHBOR_COLUMN_INDEX = 8;
+        private const int NEGATIVE_Y_NEIGHBOR_COLUMN_INDEX = 9;
+
+        private static readonly Dictionary<Vector3Int, int> NEIGHBOR_COLUMN_INDEX_BY_DIRECTION = new()
+        {
+            { Vector3Int.forward, POSITIVE_Z_NEIGHBOR_COLUMN_INDEX },
+            { Vector3Int.back, NEGATIVE_Z_NEIGHBOR_COLUMN_INDEX },
+            { Vector3Int.right, POSITIVE_X_NEIGHBOR_COLUMN_INDEX },
+            { Vector3Int.left, NEGATIVE_X_NEIGHBOR_COLUMN_INDEX },
+            { Vector3Int.up, POSITIVE_Y_NEIGHBOR_COLUMN_INDEX },
+            { Vector3Int.down, NEGATIVE_Y_NEIGHBOR_COLUMN_INDEX },
+        };
+
+        public int GetSubBlockCount() => subBlockTable != null ? subBlockTable.Rows.Count : 0;
+
+        private void OnEnable()
+        {
+            if (subBlockTable == null)
+                SetupSubBlockTable();
+        }
 
         public void OnBeforeSerialize()
         {
-            serializedSubBlocks = SerializableSubBlocksByPositionDictionary.FromNestedDictionary(SubBlocks);
+            if (subBlockTable == null || !tableUpdated)
+                return;
+                
+            var rowCount = subBlockTable.Rows.Count;
+            serializedIds = new int[rowCount];
+            serializedTypes = new SubBlockType[rowCount];
+            serializedPrefabs = new GameObject[rowCount];
+            serializedProbabilities = new float[rowCount];
+            serializedPositiveZNeighbors = new string[rowCount];
+            serializedNegativeZNeighbors = new string[rowCount];
+            serializedPositiveXNeighbors = new string[rowCount];
+            serializedNegativeXNeighbors = new string[rowCount];
+            serializedPositiveYNeighbors = new string[rowCount];
+            serializedNegativeYNeighbors = new string[rowCount];
+            
+            for (var i = 0; i < subBlockTable.Rows.Count; i++)
+            {
+                serializedIds[i] = (int)subBlockTable.Rows[i][ID_COLUMN_INDEX];
+                serializedTypes[i] = (SubBlockType)subBlockTable.Rows[i][TYPE_COLUMN_INDEX];
+                serializedPrefabs[i] = (GameObject)subBlockTable.Rows[i][PREFAB_COLUMN_INDEX];
+                serializedProbabilities[i] = (float)subBlockTable.Rows[i][PROBABILITY_COLUMN_INDEX];
+                serializedPositiveZNeighbors[i] = JsonUtility.ToJson(subBlockTable.Rows[i][POSITIVE_Z_NEIGHBOR_COLUMN_INDEX]);
+                serializedNegativeZNeighbors[i] = JsonUtility.ToJson(subBlockTable.Rows[i][NEGATIVE_Z_NEIGHBOR_COLUMN_INDEX]);
+                serializedPositiveXNeighbors[i] = JsonUtility.ToJson(subBlockTable.Rows[i][POSITIVE_X_NEIGHBOR_COLUMN_INDEX]);
+                serializedNegativeXNeighbors[i] = JsonUtility.ToJson(subBlockTable.Rows[i][NEGATIVE_X_NEIGHBOR_COLUMN_INDEX]);
+                serializedPositiveYNeighbors[i] = JsonUtility.ToJson(subBlockTable.Rows[i][POSITIVE_Y_NEIGHBOR_COLUMN_INDEX]);
+                serializedNegativeYNeighbors[i] = JsonUtility.ToJson(subBlockTable.Rows[i][NEGATIVE_Y_NEIGHBOR_COLUMN_INDEX]);
+            }
+
+            tableUpdated = false;
         }
 
         public void OnAfterDeserialize()
         {
-            SubBlocks = serializedSubBlocks.ToNestedDictionary();
+            if (subBlockTable == null)
+                SetupSubBlockTable();
+            
+            if (AreAnySerializedArraysNull())
+            {
+                Debug.Log("On Deserialization at least one of the serialized arrays was null.");
+                return;
+            }
+            
+            if (!AreAllSerializedArraysTheSameLength())
+            {
+                Debug.LogError("On Deserialization the serialized arrays did not have the same length.");
+                return;
+            }
+            
+            var rowCount = serializedIds.Length;
+            for (var i = 0; i < rowCount; i++)
+            {
+                var row = subBlockTable!.NewRow();
+                row[ID_COLUMN_INDEX] = serializedIds[i];
+                row[TYPE_COLUMN_INDEX] = serializedTypes[i];
+                row[PREFAB_COLUMN_INDEX] = serializedPrefabs[i];
+                row[PROBABILITY_COLUMN_INDEX] = serializedProbabilities[i];
+                row[POSITIVE_Z_NEIGHBOR_COLUMN_INDEX] = JsonUtility.FromJson<int[]>(serializedPositiveZNeighbors[i]);
+                row[NEGATIVE_Z_NEIGHBOR_COLUMN_INDEX] = JsonUtility.FromJson<int[]>(serializedNegativeZNeighbors[i]);
+                row[POSITIVE_X_NEIGHBOR_COLUMN_INDEX] = JsonUtility.FromJson<int[]>(serializedPositiveXNeighbors[i]);
+                row[NEGATIVE_X_NEIGHBOR_COLUMN_INDEX] = JsonUtility.FromJson<int[]>(serializedNegativeXNeighbors[i]);
+                row[POSITIVE_Y_NEIGHBOR_COLUMN_INDEX] = JsonUtility.FromJson<int[]>(serializedPositiveYNeighbors[i]);
+                row[NEGATIVE_Y_NEIGHBOR_COLUMN_INDEX] = JsonUtility.FromJson<int[]>(serializedNegativeYNeighbors[i]);
+                subBlockTable.Rows.Add(row);
+            }
         }
 
-        public void AddSubBlock(Vector3Int position, GameObject prefab)
+        public void AddSubBlock(SubBlockType type, GameObject prefab, float probability)
         {
-            if (!SubBlocks.ContainsKey(position))
-                SubBlocks.Add(position, new Dictionary<uint, GameObject>());
+            var newSubBlockRow = subBlockTable.NewRow();
+            newSubBlockRow[TYPE_COLUMN_INDEX] = type;
+            newSubBlockRow[PREFAB_COLUMN_INDEX] = prefab;
+            newSubBlockRow[PROBABILITY_COLUMN_INDEX] = probability;
+            subBlockTable.Rows.Add(newSubBlockRow);
+            var newSubBlockId = (int)newSubBlockRow[ID_COLUMN_INDEX]; 
+                
+            var enumerableSubBlockRows = subBlockTable.AsEnumerable();
+            var allDirections = Vector3Int.zero.Neighbours();
+            foreach (var direction in allDirections)
+            {
+                var neighborTypeInDirection = type.GetNeighborTypeInDirection(direction);
+                var subBlocksWithMatchingType = enumerableSubBlockRows
+                    .Where(row => (SubBlockType)row[TYPE_COLUMN_INDEX] == neighborTypeInDirection)
+                    .Select(row => (int)row[ID_COLUMN_INDEX]).ToArray();
+                newSubBlockRow[NEIGHBOR_COLUMN_INDEX_BY_DIRECTION[direction]] = subBlocksWithMatchingType;
+
+                var oppositeDirection = direction * -1;
+                foreach (var neighborId in subBlocksWithMatchingType)
+                {
+                    if (neighborId == newSubBlockId)
+                        continue;
+                    
+                    var neighborRow = subBlockTable.Rows.Find(neighborId);
+                    var allowedNeighbors = (int[])neighborRow[NEIGHBOR_COLUMN_INDEX_BY_DIRECTION[oppositeDirection]];
+                    var extendedAllowedNeighbors = new int[allowedNeighbors.Length + 1];
+                    Array.Copy(allowedNeighbors, extendedAllowedNeighbors, allowedNeighbors.Length);
+                    extendedAllowedNeighbors[^1] = newSubBlockId;
+                    neighborRow[NEIGHBOR_COLUMN_INDEX_BY_DIRECTION[oppositeDirection]] = extendedAllowedNeighbors;
+                }
+            }
             
-            SubBlocks[position].Add(nextSubBlockId++, prefab);
-            Debug.Log($"Added SubBlock {prefab.name} with position {position} and id {nextSubBlockId - 1}");
+            tableUpdated = true;
             EditorUtility.SetDirty(this);
+        }
+
+        public GameObject GetSubBlockPrefabForType(SubBlockType type)
+        {
+            return (GameObject)subBlockTable.AsEnumerable().First(row => (SubBlockType)row[TYPE_COLUMN_INDEX] == type)[PREFAB_COLUMN_INDEX];
+        }
+        
+        private void SetupSubBlockTable()
+        {
+            subBlockTable = new DataTable();
+            var idColumn = new DataColumn();
+            idColumn.ColumnName = "Id";
+            idColumn.DataType = typeof(int);
+            idColumn.ReadOnly = true;
+            idColumn.Unique = true;
+            idColumn.AutoIncrement = true;
+            subBlockTable.Columns.Add(idColumn);
+            idColumn.SetOrdinal(ID_COLUMN_INDEX);
+            subBlockTable.PrimaryKey = new[] { idColumn };
+            
+            var typeColumn = new DataColumn();
+            typeColumn.ColumnName = "Type";
+            typeColumn.DataType = typeof(SubBlockType);
+            typeColumn.ReadOnly = true;
+            subBlockTable.Columns.Add(typeColumn);
+            typeColumn.SetOrdinal(TYPE_COLUMN_INDEX);
+            
+            var prefabColumn = new DataColumn();
+            prefabColumn.ColumnName = "Prefab";
+            prefabColumn.DataType = typeof(GameObject);
+            prefabColumn.ReadOnly = true;
+            subBlockTable.Columns.Add(prefabColumn);
+            prefabColumn.SetOrdinal(PREFAB_COLUMN_INDEX);
+            
+            var probabilityColumn = new DataColumn();
+            probabilityColumn.ColumnName = "Probability";
+            probabilityColumn.DataType = typeof(float);
+            subBlockTable.Columns.Add(probabilityColumn);
+            probabilityColumn.SetOrdinal(PROBABILITY_COLUMN_INDEX);
+            
+            foreach (var (direction, allowedNeighborColumnIndex) in NEIGHBOR_COLUMN_INDEX_BY_DIRECTION)
+            {
+                var allowedNeighborsColumn = new DataColumn();
+                allowedNeighborsColumn.ColumnName = $"Allowed Neighbors {direction}";
+                allowedNeighborsColumn.DataType = typeof(int[]);
+                subBlockTable.Columns.Add(allowedNeighborsColumn);
+                allowedNeighborsColumn.SetOrdinal(allowedNeighborColumnIndex);
+            }
+        }
+
+        private bool AreAnySerializedArraysNull()
+        {
+            return serializedIds == null ||
+                   serializedTypes == null ||
+                   serializedPrefabs == null ||
+                   serializedProbabilities == null ||
+                   serializedPositiveZNeighbors == null ||
+                   serializedNegativeZNeighbors == null ||
+                   serializedPositiveXNeighbors == null ||
+                   serializedNegativeXNeighbors == null ||
+                   serializedPositiveYNeighbors == null ||
+                   serializedNegativeYNeighbors == null;
+        }
+
+        private bool AreAllSerializedArraysTheSameLength()
+        {
+            return serializedIds.Length == serializedTypes.Length &&
+                   serializedIds.Length == serializedPrefabs.Length &&
+                   serializedIds.Length == serializedProbabilities.Length &&
+                   serializedIds.Length == serializedPositiveZNeighbors.Length &&
+                   serializedIds.Length == serializedNegativeZNeighbors.Length &&
+                   serializedIds.Length == serializedPositiveXNeighbors.Length &&
+                   serializedIds.Length == serializedNegativeXNeighbors.Length &&
+                   serializedIds.Length == serializedPositiveYNeighbors.Length &&
+                   serializedIds.Length == serializedNegativeYNeighbors.Length;
         }
 
         [ContextMenu("Print All SubBlocks")]
         public void PrintAllSubBlocks()
         {
-            foreach (var (position, blocksById) in SubBlocks)
+            foreach (DataRow row in subBlockTable.Rows)
             {
-                foreach (var (id, block) in blocksById)
-                {
-                    Debug.Log($"{id}, {(block ? block.name : "no name")} at {position}");                    
-                }
-            }
-        }
-        
-        [Serializable]
-        private class SerializableSubBlockByIdDictionary
-        {
-            [SerializeField] private List<uint> ids = new();
-            [SerializeField] private List<GameObject> blocks = new();
-
-            public Dictionary<uint, GameObject> ToDictionary()
-            {
-                var dict = new Dictionary<uint, GameObject>();
-                for (var i = 0; i < ids.Count; i++)
-                {
-                    dict.Add(ids[i], blocks[i]);
-                }
-                return dict;
-            }
-
-            public static SerializableSubBlockByIdDictionary FromDictionary(Dictionary<uint, GameObject> dict)
-            {
-                var serializableDict = new SerializableSubBlockByIdDictionary
-                {
-                    ids = new List<uint>(),
-                    blocks = new List<GameObject>()
-                };
-                foreach (var (id, block) in dict)
-                {
-                    serializableDict.ids.Add(id);
-                    serializableDict.blocks.Add(block);
-                }
-                return serializableDict;
-            }
-        }
-
-        [Serializable]
-        private class SerializableSubBlocksByPositionDictionary
-        {
-            [SerializeField] private List<Vector3Int> positions;
-            [SerializeField] private List<SerializableSubBlockByIdDictionary> blocksById;
-            
-            public Dictionary<Vector3Int, Dictionary<uint, GameObject>> ToNestedDictionary()
-            {
-                var dict = new Dictionary<Vector3Int, Dictionary<uint, GameObject>> ();
-                for (var i = 0; i < positions.Count; i++)
-                {
-                    dict.Add(positions[i], blocksById[i].ToDictionary());
-                }
-                return dict;
-            }
-
-            public static SerializableSubBlocksByPositionDictionary FromNestedDictionary(Dictionary<Vector3Int, Dictionary<uint, GameObject>> dict)
-            {
-                var serializableDict = new SerializableSubBlocksByPositionDictionary
-                {
-                    positions = new List<Vector3Int>(),
-                    blocksById = new List<SerializableSubBlockByIdDictionary>()
-                };
-                foreach (var (pos, blocksById) in dict)
-                {
-                    serializableDict.positions.Add(pos);
-                    serializableDict.blocksById.Add(SerializableSubBlockByIdDictionary.FromDictionary(blocksById));
-                }
-                return serializableDict;
+                Debug.Log($"{row[ID_COLUMN_INDEX]}, {(SubBlockType)row[TYPE_COLUMN_INDEX]}: {((GameObject)row[PREFAB_COLUMN_INDEX]).name}");
             }
         }
     }
