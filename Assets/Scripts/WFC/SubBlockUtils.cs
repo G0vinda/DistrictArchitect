@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace WFC
@@ -213,6 +214,34 @@ namespace WFC
                 { x: 0, y: -1, z: 0 } => SubBlockType.BottomFace,
                 _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
             };
+        }
+
+        public static bool TryExtractSubBlockTypeFromName(string name, out SubBlockType subBlockType)
+        {
+            var abbreviationPairs = new Dictionary<string, SubBlockType>
+            {
+                { "_TC", SubBlockType.TopCorner },
+                { "_BC", SubBlockType.BottomCorner },
+                { "_TE", SubBlockType.TopEdge },
+                { "_ME", SubBlockType.MiddleEdge },
+                { "_BE", SubBlockType.BottomEdge },
+                { "_TF", SubBlockType.TopFace },
+                { "_MF", SubBlockType.MiddleFace },
+                { "_BF", SubBlockType.BottomFace },
+                { "_C", SubBlockType.Center }
+            };
+
+            foreach (var (abbreviation, type) in abbreviationPairs)
+            {
+                if (name.Contains(abbreviation))
+                {
+                    subBlockType = type;
+                    return true;
+                }
+            }
+            
+            subBlockType = default;
+            return false;
         }
     }
 }
