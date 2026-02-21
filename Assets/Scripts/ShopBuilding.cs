@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class ShopBuilding : Building
 {
-    private const int BASE_FOOD = 3;
+    private const int BASE_FOOD = 5;
     private const int FOOD_INCREMENT = 2;
     public override PlacementResults GetPlacementReward(Grid grid, Vector3Int position)
     {

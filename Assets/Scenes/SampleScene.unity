@@ -2785,6 +2785,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   camControls: {fileID: 1088046477}
   playerInput: {fileID: 11400000, guid: 692e78c876cbd3649aea4fa9ed7f80a7, type: 2}
+  shapeManager: {fileID: 787697909}
   debugHoverText: {fileID: 1178236361}
   cameraControls: {fileID: 1088046477}
   buildingPreviewMaterial: {fileID: 2100000, guid: c5c0b2281799a694686a8e230be46256, type: 2}

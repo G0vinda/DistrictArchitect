@@ -7,7 +7,7 @@ using UnityEngine;
 public class GreenhouseBuilding : Building
 {
     private const int BASE_FOOD = 3;
-    private const int FOOD_INCREMENT = 2;
+    private const int FOOD_INCREMENT = 3;
     [SerializeField] private Building gardenBuilding;
 
     public override PlacementResults GetPlacementReward(Grid grid, Vector3Int position)

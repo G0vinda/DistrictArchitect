@@ -42,7 +42,7 @@ public bool IsPlacing => currentShape != null;
         _cam = Camera.main;
         
         var initialFillerShape = ShapeGenerator.Generate(shapeManager.GetInitialFillerShapeDefinition());
-        PlaceShape(initialFillerShape, new Vector3Int(0, 0, 0));
+        PlaceShape(initialFillerShape, new Vector3Int(0, 0, 0), false);
     }
 
     private void OnEnable()
@@ -174,11 +174,11 @@ public bool IsPlacing => currentShape != null;
         if(isGameOver) GameOver?.Invoke();
     }
 
-    private bool PlaceShape(Shape shape, Vector3Int finalShapeCoordinates)
+    private bool PlaceShape(Shape shape, Vector3Int finalShapeCoordinates, bool placedByPlayer = true)
     {
         var finalShapePosition = Grid.GridCoordinatesToWorldPosition(finalShapeCoordinates);
         shape.transform.position = finalShapePosition;
-        var isGameOver = Grid.PlaceShapeAtPosition(shape, finalShapeCoordinates);
+        var isGameOver = Grid.PlaceShapeAtPosition(shape, finalShapeCoordinates, placedByPlayer);
         shape.SetMaterialAlpha(1.0f);
         shape.EnableColliders();
         return isGameOver;
