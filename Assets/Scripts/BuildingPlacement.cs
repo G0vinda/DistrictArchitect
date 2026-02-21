@@ -11,14 +11,16 @@ public class BuildingPlacement : MonoBehaviour
 {
     [SerializeField] private CameraControls camControls;
     [SerializeField] private PlayerInput playerInput;
+    [SerializeField] private ShapeManager shapeManager;
     [SerializeField] private TextMeshProUGUI debugHoverText;
     [SerializeField] private CameraControls cameraControls;
     [SerializeField] private Material buildingPreviewMaterial;
     [SerializeField] private Material buildingPreviewDisabledMaterial;
     [SerializeField] private float previewMaterialAlpha = 0.6f;
-    [SerializeField] private UnityEvent<int> floorChanged; 
+    [SerializeField] private UnityEvent<int> floorChanged;
     
-    public bool IsPlacing => currentShape != null;
+
+public bool IsPlacing => currentShape != null;
     public Grid Grid { get; private set; }
     
     public Action<Vector3> PlacedBuilding;
@@ -38,6 +40,9 @@ public class BuildingPlacement : MonoBehaviour
     {
         Grid = new Grid();
         _cam = Camera.main;
+        
+        var initialFillerShape = ShapeGenerator.Generate(shapeManager.GetInitialFillerShapeDefinition());
+        PlaceShape(initialFillerShape, new Vector3Int(0, 0, 0));
     }
 
     private void OnEnable()
@@ -49,6 +54,7 @@ public class BuildingPlacement : MonoBehaviour
         playerInput.OnFloorChanged += AdjustPlacementHeightToFloorChange;
         playerInput.OnCameraRotationStarted += FreezePreviewUpdate;
         cameraControls.OnCameraSnappedInPlace += UnfreezePreviewUpdate;
+        
     }
 
     private void OnDisable()
@@ -160,15 +166,22 @@ public class BuildingPlacement : MonoBehaviour
 
         var finalShapeCoordinates = _lastHoveredGridCoordinates.Value + Vector3Int.up * _blockYAdjustment;
         var finalShapePosition = Grid.GridCoordinatesToWorldPosition(finalShapeCoordinates);
-        currentShape.transform.position = finalShapePosition;
-        var isGameOver = Grid.PlaceShapeAtPosition(currentShape, finalShapeCoordinates);
-        currentShape.SetMaterialAlpha(1.0f);
-        currentShape.EnableColliders();
+        var isGameOver = PlaceShape(currentShape, finalShapeCoordinates);
         PlayPlacementAnimation();
         currentShape = null;
         
         PlacedBuilding?.Invoke(finalShapePosition);
         if(isGameOver) GameOver?.Invoke();
+    }
+
+    private bool PlaceShape(Shape shape, Vector3Int finalShapeCoordinates)
+    {
+        var finalShapePosition = Grid.GridCoordinatesToWorldPosition(finalShapeCoordinates);
+        shape.transform.position = finalShapePosition;
+        var isGameOver = Grid.PlaceShapeAtPosition(shape, finalShapeCoordinates);
+        shape.SetMaterialAlpha(1.0f);
+        shape.EnableColliders();
+        return isGameOver;
     }
 
     private void PlayPlacementAnimation()

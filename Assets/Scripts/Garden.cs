@@ -4,7 +4,7 @@ using System.Linq;
 using DefaultNamespace;
 using UnityEngine;
 
-public class GardenBuilding : Building
+public class Garden : Building
 {
     public override PlacementResults GetPlacementReward(Grid grid, Vector3Int position)
     {

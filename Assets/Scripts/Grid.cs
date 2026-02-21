@@ -35,7 +35,7 @@ public class Grid
 
     public bool CanShapeBePlacedAtArea(IEnumerable<Vector3Int> area)
     {
-        var isEmpty = area.All(coord => grid.ContainsKey(coord) && grid[coord] == null);
+        var isEmpty = area.All(coord => grid.ContainsKey(coord) && (grid[coord] == null || !grid[coord].Building.isBlocking));
         var hasGround = area.Any(coord =>
             coord.y == 0 || grid.ContainsKey(coord + Vector3Int.down) && grid[coord + Vector3Int.down] != null);
         return isEmpty && hasGround;
@@ -64,6 +64,20 @@ public class Grid
 
     public bool PlaceShapeAtPosition(Shape shape, Vector3Int position)
     {
+        var countHarvestedFields = 0;
+        foreach (var localCoordinate in shape.CellsByCoordinate.Keys)
+        {
+            var gridCoordinate = localCoordinate + position;
+            if (grid[gridCoordinate] == null || grid[gridCoordinate].Building is not Field)
+                continue;
+            
+            grid[gridCoordinate].DestroyWithVfx();
+            countHarvestedFields++;
+        }
+
+        Debug.Log(countHarvestedFields + " fields harvested!");
+        foodCount += countHarvestedFields;
+
         var doesPlacementFinishGame = AddShapeToGrid(shape, position);
 
         GetRewardsFromShape(shape, position);
@@ -155,33 +169,5 @@ public class Grid
         }
 
         return clusterCoordinates;
-    }
-
-    public List<Vector3Int> GetAllGridCoordinates()
-    {
-        return grid.Keys.ToList();
-    }
-
-    public List<Vector3Int> GetRow(Vector2Int rowConstant, int dimension)
-    {
-        var row = new List<Vector3Int>();
-
-        for (var i = 0; i < MAP_SIZE; i++)
-        {
-            switch (dimension)
-            {
-                case 0:
-                    row.Add(new Vector3Int(i, rowConstant.x, rowConstant.y));
-                    break;
-                case 1:
-                    row.Add(new Vector3Int(rowConstant.x, i, rowConstant.y));
-                    break;
-                case 2:
-                    row.Add(new Vector3Int(rowConstant.x, rowConstant.y, i));
-                    break;
-            }
-        }
-
-        return row;
     }
 }

@@ -1481,6 +1481,10 @@ MonoBehaviour:
   - {fileID: 7888347615070176440, guid: 563df06f150c97a4a8bf493443dfe8d0, type: 3}
   - {fileID: 7161227722884605308, guid: 8e6c58f47bc0f9b4bb942255dc59bb93, type: 3}
   - {fileID: 7161227722884605308, guid: 8e6c58f47bc0f9b4bb942255dc59bb93, type: 3}
+  fillerBuildings:
+  - {fileID: 6142966157771956833, guid: f685df177b46e0b4cb9aa0b1c8497d79, type: 3}
+  fillerBuildingQuota:
+  - 0.5
 --- !u!4 &787697910
 Transform:
   m_ObjectHideFlags: 0

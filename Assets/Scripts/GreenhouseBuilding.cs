@@ -41,6 +41,6 @@ public class GreenhouseBuilding : Building
                && grid.GetCellAt(neighborPosition) == null
                && (neighborPosition.y == 0 
                    || (grid.GetCellAt(supportPosition) != null
-                       && grid.GetCellAt(supportPosition).Building is not GardenBuilding));
+                       && grid.GetCellAt(supportPosition).Building.isSupporting));
     }
 }

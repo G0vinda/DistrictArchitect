@@ -452,6 +452,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <Material>k__BackingField: {fileID: 2100000, guid: a96074c3e05972a4ab4daa24f692ec65, type: 2}
+  <isBlocking>k__BackingField: 1
+  <isSupporting>k__BackingField: 0
 --- !u!4 &5145238961752457150 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3469766231931158350, guid: 141f90602e615e4478cba362096d2b92, type: 3}
