@@ -69,7 +69,7 @@ public class BuildingPlacement : MonoBehaviour
         if (currentShape)
             Destroy(currentShape);
         
-        currentShape = ShapeGenerator.Instance.Generate(cellDataByPositions);
+        currentShape = ShapeGenerator.Generate(cellDataByPositions);
         currentShape.SetMaterialAlpha(previewMaterialAlpha);
         for (int i = 0; i < nRightRotations; i++)
         {
@@ -114,7 +114,7 @@ public class BuildingPlacement : MonoBehaviour
         if (_lastHoveredGridCoordinates != null && gridCoordinates == _lastHoveredGridCoordinates.Value)
             return;
 
-        if (!Grid.IsCoordinateInGrid(gridCoordinates))
+        if (!Grid.HasCoordinate(gridCoordinates))
         {
             _lastHoveredGridCoordinates = null;
             _placeable = false;
@@ -184,7 +184,6 @@ public class BuildingPlacement : MonoBehaviour
 
     private void TurnPreviewHorizontally(float turnDirection)
     {
-        Debug.Log("Should be Turning Preview Horizontally");
         if (!currentShape)
             return;
         

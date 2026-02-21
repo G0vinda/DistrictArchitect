@@ -19,7 +19,6 @@ public class Shape : MonoBehaviour
 
     public void Rotate90(Vector3Int axis, int turnDirection)
     {
-        Debug.Log("Rotate90 called on shapeObject");
         var rotatedCellsByCoordinates = new Dictionary<Vector3Int, Cell>();
         foreach (var (coord, cell) in CellsByCoordinate)
         {
@@ -53,7 +52,6 @@ public class Shape : MonoBehaviour
 
     private IEnumerator RotationRoutine()
     {
-        Debug.Log("RotationRoutine on shapeObject started");
         var t = 0f;
         var rotationSpeed = 3f;
         do
@@ -62,6 +60,5 @@ public class Shape : MonoBehaviour
             transform.rotation = Quaternion.Slerp(transform.rotation, _desiredRotation, t);
             yield return null;
         } while (t <= 1f);
-        Debug.Log("RotationRoutine on shapeObject ended");
     }
 }

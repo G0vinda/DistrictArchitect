@@ -1,0 +1,13 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using DefaultNamespace;
+using UnityEngine;
+
+public class GardenBuilding : Building
+{
+    public override PlacementResults GetPlacementReward(Grid grid, Vector3Int position)
+    {
+        return new PlacementResults(0, 0, 0);
+    }
+}
