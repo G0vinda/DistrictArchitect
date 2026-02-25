@@ -1,0 +1,49 @@
+Toggle .background {
+    background-color: rgb(41, 41, 41);
+    padding-top: 3px;
+    padding-right: 3px;
+    padding-bottom: 3px;
+    padding-left: 3px;
+    border-left-color: rgb(77, 77, 77);
+    border-right-color: rgb(77, 77, 77);
+    border-top-color: rgb(77, 77, 77);
+    border-bottom-color: rgb(77, 77, 77);
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+}
+
+Toggle .background-on {
+    background-color: rgb(88, 88, 88);
+    padding-top: 3px;
+    padding-right: 3px;
+    padding-bottom: 3px;
+    padding-left: 3px;
+}
+
+Toggle Label {
+    color: #a8a8a8;
+}
+
+Toggle .background-on > Label {
+    color: #D2D2D2;
+}
+
+ToggleBar {
+    padding-right: 5px;
+    padding-left: 5px;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+ToggleBar > .first > #Background
+{
+    border-radius: 3px 0 0 3px;
+}
+
+ToggleBar > .last > #Background
+{
+    border-radius: 0 3px 3px 0;
+}

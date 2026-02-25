@@ -183,7 +183,7 @@ namespace WFC
                 { x: -1, y: 0, z: 0 } => SubBlockType.Center,
                 { x: 0, y: 0, z: -1 } => SubBlockType.MiddleEdge,
                 { x: 0, y: 1, z: 0 } => SubBlockType.TopEdge,
-                { x: 0, y: -1, z: 0 } => SubBlockType.BottomCorner,
+                { x: 0, y: -1, z: 0 } => SubBlockType.BottomEdge,
                 _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
             };
         }
