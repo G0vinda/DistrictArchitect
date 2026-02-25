@@ -2,15 +2,28 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+
 public class Grid
 {
     private readonly Dictionary<Vector3Int, Cell> grid = new();
 
     public const int MAP_SIZE = 5;
     public const float CELL_SIZE = 1f;
-    public const float BLOCK_OFFSET = 0.5f;
-    public const int GAME_OVER_HEIGHT = 5;
+    
+    private const float BLOCK_OFFSET = 0.5f;
+    private const int GAME_OVER_HEIGHT = 5;
 
+    private const int PEOPLE_PER_FOOD = 5;
+    private const int TAX_PER_LEVEL = 10;
+
+    private int peopleCount = 0;
+    private int foodCount = 10;
+    private int moneyCount = 0;
+
+    private int dayCount = 0;
+
+    public readonly Dictionary<Vector3Int, SmokeOrigin> SmokePointsByFactoryOrigin = new();
+    
     public Grid()
     {
         for (var x = 0; x < MAP_SIZE; x++)
@@ -20,23 +33,24 @@ public class Grid
                 for (var z = 0; z < MAP_SIZE; z++)
                 {
                     grid.Add(new Vector3Int(x, y, z), null);
-                }   
+                }
             }
         }
     }
 
     public bool CanShapeBePlacedAtArea(IEnumerable<Vector3Int> area)
     {
-        var isEmpty = area.All(coord => grid.ContainsKey(coord) && grid[coord] == null);
-        var hasGround = area.Any(coord => coord.y == 0 || grid.ContainsKey(coord + Vector3Int.down) && grid[coord + Vector3Int.down] != null);
+        var isEmpty = area.All(coord => grid.ContainsKey(coord) && (grid[coord] == null || !grid[coord].Building.isBlocking));
+        var hasGround = area.Any(coord =>
+            coord.y == 0 || grid.ContainsKey(coord + Vector3Int.down) && grid[coord + Vector3Int.down] != null);
         return isEmpty && hasGround;
     }
 
-    public static bool IsCoordinateInGrid(Vector3Int coordinate)
+    public static bool HasCoordinate(Vector3Int coordinate)
     {
         return coordinate is { x: >= 0 and < MAP_SIZE, y: >= 0 and < MAP_SIZE, z: >= 0 and < MAP_SIZE };
     }
-    
+
     public static Vector3Int WorldPositionToGridCoordinates(Vector3 position)
     {
         return new Vector3Int(
@@ -53,68 +67,99 @@ public class Grid
             coordinates.z * CELL_SIZE + BLOCK_OFFSET);
     }
 
-    public bool PlaceShapeAtPosition(Shape shape, Vector3Int position)
+    public bool PlaceShapeAtPosition(Shape shape, Vector3Int position, bool placementByPlayer = true)
     {
-        var doesPlacementFinishGame = false;
+        HarvestFields(shape, position);
+        AddShapeToGrid(shape, position);
+        GetRewardsFromShape(shape, position);
+
+        var gameFinished = false;
+        if (placementByPlayer)
+            gameFinished = AdvanceDay();
+        
+        return gameFinished;
+    }
+
+    private bool AdvanceDay()
+    {
+        dayCount++;
+        
+        var eatenFood = peopleCount / PEOPLE_PER_FOOD;
+        eatenFood += peopleCount % PEOPLE_PER_FOOD != 0 ? 1 : 0;
+        foodCount -= eatenFood;
+        Debug.Log(peopleCount + " people eat " + eatenFood + " food!");
+
+        if (dayCount % 7 == 0)
+        {
+            var highestLevel = GetHighestLevel();
+            var taxes = highestLevel * TAX_PER_LEVEL;
+            moneyCount -= taxes;
+            Debug.Log("The City is " + highestLevel * 10 + " meters high and was taxed " + taxes + " money!");
+        }
+
+        Debug.Log("Day " + dayCount + "! People: " + peopleCount + ", Food: " + foodCount + ", Money: " + moneyCount);
+        
+        if (foodCount < 0 && moneyCount >= 0)
+            Debug.Log("LOSS BY STARVATION");
+        else if (moneyCount < 0 && foodCount >= 0)
+            Debug.Log("LOSS BY BANKRUPTCY");
+        else if (foodCount < 0)
+            Debug.Log("LOSS BY BANKRUPT STARVATION");
+
+        return foodCount < 0 || moneyCount < 0;
+    }
+
+    private void HarvestFields(Shape shape, Vector3Int position)
+    {
+        var countHarvestedFields = 0;
+        foreach (var localCoordinate in shape.CellsByCoordinate.Keys)
+        {
+            var gridCoordinate = localCoordinate + position;
+            if (grid[gridCoordinate] == null || grid[gridCoordinate].Building is not Field)
+                continue;
+            
+            grid[gridCoordinate].DestroyWithVfx();
+            countHarvestedFields++;
+        }
+
+        Debug.Log(countHarvestedFields + " fields harvested!");
+        foodCount += countHarvestedFields;
+    }
+
+    private void GetRewardsFromShape(Shape shape, Vector3Int position)
+    {
         foreach (var (localCoordinate, cell) in shape.CellsByCoordinate)
         {
             var gridCoordinate = localCoordinate + position;
-            if (gridCoordinate.y >= (GAME_OVER_HEIGHT-1)) doesPlacementFinishGame = true;
-            grid[gridCoordinate] = cell;
-        }
+            var result = cell.Building.GetPlacementReward(this, gridCoordinate);
+            peopleCount += result.PeopleCount;
+            foodCount += result.FoodCount;
+            moneyCount += result.MoneyCount;
 
-        UpdateBuildingStates();
+            foreach (var extraShape in result.ExtraShapesToPlace)
+                PlaceShapeAtPosition(extraShape, gridCoordinate, false);
         
-        return doesPlacementFinishGame;
-    }
-
-    private void UpdateBuildingStates()
-    {
-        foreach (var (coordinate, cell) in grid)
-        {
-            if (cell == null) continue;
-            
-            var residentialBuilding = cell.Building as ResidentialBuilding;
-            if (residentialBuilding == null || residentialBuilding.IsAtFullCapacity)
-                continue;
-
-            var searchQueue = new Queue<Vector3Int>(coordinate.Neighbours());
-            var visited = new HashSet<Vector3Int>() { coordinate };
-            while (!residentialBuilding.IsAtFullCapacity && searchQueue.Count > 0)
-            {
-                var searchCoordinate = searchQueue.Dequeue();
-                if (!grid.ContainsKey(searchCoordinate) 
-                    || grid[searchCoordinate] == null 
-                    || !visited.Add(searchCoordinate))
-                    continue;
-
-                switch (grid[searchCoordinate].Building)
-                {
-                    case FoodBuilding foodBuilding:
-                        var foodNeeded = residentialBuilding.MaximumCapacity - residentialBuilding.NumberOfResidents;
-                        var transferCount = Mathf.Min(foodNeeded, foodBuilding.AmountOfFoodLeft);
-                        residentialBuilding.NumberOfResidents += transferCount;
-                        residentialBuilding.GetComponent<DebugBalls>().Count = residentialBuilding.NumberOfResidents;
-                        foodBuilding.AmountOfFoodLeft -= transferCount;
-                        foodBuilding.GetComponent<DebugBalls>().Count = foodBuilding.AmountOfFoodLeft;
-                        Debug.Log("Residential Building at " + coordinate +
-                                  " was supplied with food and now has " + residentialBuilding.NumberOfResidents +
-                                  " residents.");
-                        break;
-                    case InfrastructureBuilding:
-                        foreach (var neighbour in 
-                                 searchCoordinate.Neighbours()
-                                     .Where(neighbour => !visited.Contains(neighbour)))
-                        {
-                            searchQueue.Enqueue(neighbour);
-                        }
-                        break;
-                }
-            }
+            Debug.Log("The " + cell.Building.GetType() + " at " + gridCoordinate + " gave " + 
+                      result.PeopleCount + " people, " + 
+                      result.FoodCount + " food and " + 
+                      result.MoneyCount + " money.");
         }
     }
-    
-    
+
+    private void AddShapeToGrid(Shape shape, Vector3Int position)
+    {
+        foreach (var (localCoordinate, cell) in shape.CellsByCoordinate)
+        {
+            var gridCoordinate = localCoordinate + position;
+            PlaceCellAt(cell, gridCoordinate);
+        }
+    }
+
+    public void PlaceCellAt(Cell cell, Vector3Int gridCoordinate)
+    {
+        grid[gridCoordinate] = cell;
+    }
+
 
     public List<Cell> GetAllCellObjects()
     {
@@ -126,68 +171,43 @@ public class Grid
         return grid.Keys.Where(coord => grid[coord] != null).ToList();
     }
 
-    public Cell GetCellObjectAtCoordinates(Vector3Int coordinates)
+    public Cell GetCellAt(Vector3Int coordinates)
     {
         return grid[coordinates];
     }
 
     public List<Vector3Int> FindCellCluster(Vector3Int startCoordinate)
     {
-        if (grid[startCoordinate] == null) 
+        if (grid[startCoordinate] == null)
             return new List<Vector3Int>();
         
-        var openCoordinates = new Queue<Vector3Int>();
-        openCoordinates.Enqueue(startCoordinate);
-        var closedCoordinates = new HashSet<Vector3Int>() {startCoordinate};
-        var clusterCoordinates = new List<Vector3Int>() {startCoordinate};
-        var directions = new[]
-            { Vector3Int.up, Vector3Int.down, Vector3Int.right, Vector3Int.left, Vector3Int.forward, Vector3Int.back };
-        var clusterData = grid[startCoordinate].Building;
-
-        while (openCoordinates.Count > 0)
+        var searchQueue = new Queue<Vector3Int>(startCoordinate.Neighbours());
+        var visited = new HashSet<Vector3Int>() { startCoordinate };
+        var clusterCoordinates = new List<Vector3Int>() { startCoordinate };
+        var clusteredBuilding = GetCellAt(startCoordinate).Building.GetType();
+        
+        while (searchQueue.Count > 0)
         {
-            var current = openCoordinates.Dequeue();
-            foreach (var dir in directions)
-            {
-                var neighbor = current + dir;
-                if (!closedCoordinates.Add(neighbor))
-                    continue;
+            var searchCoordinate = searchQueue.Dequeue();
+            var isNewCoordinate = visited.Add(searchCoordinate);
+            
+            if (!HasCoordinate(searchCoordinate)
+                || !isNewCoordinate
+                || GetCellAt(searchCoordinate) == null
+                || GetCellAt(searchCoordinate).Building.GetType() != clusteredBuilding)
+                continue;
 
-                if (!IsCoordinateInGrid(neighbor))
-                    continue;
-                
-                if (grid[neighbor] == null || grid[neighbor].Building != clusterData)
-                    continue;
-                
-                clusterCoordinates.Add(neighbor);
-                openCoordinates.Enqueue(neighbor);
-            }
+            foreach (var neighbor in searchCoordinate.Neighbours())
+                searchQueue.Enqueue(neighbor);
+
+            clusterCoordinates.Add(searchCoordinate);
         }
+
         return clusterCoordinates;
     }
 
-    public List<Vector3Int> GetAllGridCoordinates()
+    private int GetHighestLevel()
     {
-        return grid.Keys.ToList();
-    }
-
-    public List<Vector3Int> GetRow(Vector2Int rowConstant, int dimension)
-    {
-        var row = new List<Vector3Int>();
-
-        for (var i = 0; i < MAP_SIZE; i++)
-        {
-            switch (dimension)
-            {
-                case 0: row.Add(new Vector3Int(i, rowConstant.x, rowConstant.y));
-                    break;
-                case 1: row.Add(new Vector3Int(rowConstant.x, i, rowConstant.y));
-                    break;
-                case 2: row.Add(new Vector3Int(rowConstant.x, rowConstant.y, i));
-                    break;
-            }
-        }
-
-        return row;
+        return GetAllCellCoordinates().Max(p => p.y);
     }
 }

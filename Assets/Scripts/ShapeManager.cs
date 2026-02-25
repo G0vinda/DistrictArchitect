@@ -1,13 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Serialization;
+using Random = UnityEngine.Random;
 
 public class ShapeManager : MonoBehaviour
 {
     private List<List<Vector3Int>> _shapes = new();
 
     [SerializeField] private Building[] buildings;
+    [SerializeField] private Building[] fillerBuildings;
+    [SerializeField] private float[] fillerBuildingQuota;
     
     private void Awake()
     {
@@ -53,5 +57,34 @@ public class ShapeManager : MonoBehaviour
         }
 
         return buildingByCoordinates;
+    }
+
+    public Dictionary<Vector3Int, Building> GetInitialFillerShapeDefinition()
+    {
+        //populate positions to pick from
+        var availablePositions = new List<Vector3Int>();
+        for (var x = 0; x < Grid.MAP_SIZE; x++)
+        {
+            for (var z = 0; z < Grid.MAP_SIZE; z++)
+                availablePositions.Add(new Vector3Int(x, 0, z));
+        }
+        
+        var shapeDefinition = new Dictionary<Vector3Int, Building>();
+        
+        for (var i = 0; i < fillerBuildings.Length; i++)
+        {
+            var fillerBuilding = fillerBuildings[i];
+            var quota = fillerBuildingQuota[i];
+            var nBuildingsToPlace = Mathf.FloorToInt(Grid.MAP_SIZE * Grid.MAP_SIZE * quota);
+
+            for (var j = 0; j < nBuildingsToPlace; j++)
+            {
+                var position = availablePositions[Random.Range(0, availablePositions.Count)];
+                availablePositions.Remove(position);
+                shapeDefinition.Add(position, fillerBuilding);
+            }
+        }
+        
+        return shapeDefinition;
     }
 }

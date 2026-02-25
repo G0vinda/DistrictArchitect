@@ -12,7 +12,7 @@ public class ShapeGenerator : MonoBehaviour
         Instance = this;
     }
 
-    public Shape GenerateCentered(Dictionary<Vector3Int, Building> cellDataByCoordinates)
+    public static Shape GenerateCentered(Dictionary<Vector3Int, Building> cellDataByCoordinates)
     {
         var blockPositions = cellDataByCoordinates.Keys;
         var centerX = Mathf.Lerp(blockPositions.Min(pos => pos.x), blockPositions.Max(pos => pos.x), .5f);
@@ -23,7 +23,7 @@ public class ShapeGenerator : MonoBehaviour
         return Generate(cellDataByCoordinates, meshBoundCenter);
     }
 
-    public Shape Generate(Dictionary<Vector3Int, Building> buildingByCoordinates, Vector3 customCenter = default)
+    public static Shape Generate(Dictionary<Vector3Int, Building> buildingByCoordinates, Vector3 customCenter = default)
     {
         var go = new GameObject
         {
@@ -41,10 +41,6 @@ public class ShapeGenerator : MonoBehaviour
             var newBuilding = Instantiate(building, position, Quaternion.identity, shapeObject.transform);
             var cell = newBuilding.gameObject.GetComponent<Cell>();
             shapeObject.CellsByCoordinate.Add(coordinates, cell);
-            if (newBuilding.TryGetComponent<FoodBuilding>(out var foodBuilding))
-            {
-                newBuilding.GetComponent<DebugBalls>().Count = foodBuilding.AmountOfFoodLeft;
-            }
         }
         return shapeObject;
     }

@@ -101,7 +101,7 @@ public class ClusterEvaluationEffect : MonoBehaviour
             clusterScoreText.text = currentClusterScore.ToString();
         });
         
-        validationSequence.AppendCallback(() => SetNewCameraAim(grid.GetCellObjectAtCoordinates(currentCluster[0]).transform.position));
+        validationSequence.AppendCallback(() => SetNewCameraAim(grid.GetCellAt(currentCluster[0]).transform.position));
         validationSequence.AppendCallback(() => HighlightNewCells(currentCluster));
         if (currentCluster.Count > 1)
         {
@@ -127,7 +127,7 @@ public class ClusterEvaluationEffect : MonoBehaviour
         
         for (var i = 0; i < currentCluster.Count; i++)
         {
-            var cell = grid.GetCellObjectAtCoordinates(currentCluster[i]);
+            var cell = grid.GetCellAt(currentCluster[i]);
 
             var camEffektIntensity = Mathf.InverseLerp(0, maxEffektCount - 1, i);
 
@@ -164,10 +164,10 @@ public class ClusterEvaluationEffect : MonoBehaviour
         var grid = buildingPlacement.Grid;
         
         validationSequence.AppendCallback(() =>
-            SetNewCameraAim(grid.GetCellObjectAtCoordinates(position).transform.position));
+            SetNewCameraAim(grid.GetCellAt(position).transform.position));
         validationSequence.AppendInterval(speed);
         
-        var cell = grid.GetCellObjectAtCoordinates(position);
+        var cell = grid.GetCellAt(position);
         validationSequence.Append(cell.transform.DOScale(Vector3.one * 1.15f, speed /4));
         validationSequence.Append(cell.transform.DOScale(Vector3.one * 1f, speed * 3/4).SetEase(Ease.OutSine));
         
@@ -214,7 +214,7 @@ public class ClusterEvaluationEffect : MonoBehaviour
 
         foreach (var highLightCoordinate in highLightCoordinates)
         {
-            var cellObject = buildingPlacement.Grid.GetCellObjectAtCoordinates(highLightCoordinate);
+            var cellObject = buildingPlacement.Grid.GetCellAt(highLightCoordinate);
             cellObject.SetAlpha(1.0f);
             cellObject.SetCastShadows(true);
         }

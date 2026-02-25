@@ -23,7 +23,7 @@ public class BlockSelectionRenderSet : MonoBehaviour
         if (Shape != null)
             Destroy(Shape.gameObject);
         
-        Shape = ShapeGenerator.Instance.GenerateCentered(shapeDefinition);
+        Shape = ShapeGenerator.GenerateCentered(shapeDefinition);
         Shape.transform.SetParent(renderObjectParent);
         Shape.transform.position = renderObjectParent.position;
     }

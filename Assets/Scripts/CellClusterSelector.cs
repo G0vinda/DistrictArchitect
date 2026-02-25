@@ -49,7 +49,7 @@ public class CellClusterSelector : MonoBehaviour
         
         foreach (var clusterCoordinate in clusterCoordinates)
         {
-            var cellObject = buildingPlacement.Grid.GetCellObjectAtCoordinates(clusterCoordinate);
+            var cellObject = buildingPlacement.Grid.GetCellAt(clusterCoordinate);
             cellObject.SetAlpha(1.0f);
             cellObject.SetCastShadows(true);
         }
