@@ -11,7 +11,8 @@ namespace WFC
 {
     public class WfcBlockCreator : MonoBehaviour
     {
-        [SerializeField] private WfcConfig config;
+        [field: SerializeField] public WfcConfig Config { get; private set; }
+        
         [SerializeField] private GameObject blockPrefab;
         [SerializeField] private BuildingSelection selection;
 
@@ -22,14 +23,17 @@ namespace WFC
         private Dictionary<Vector3Int, GameObject> _blockObjectByBigCoordinate = new();
         private Vector3Int _lastHoveredCoordinate;
 
-        private const float SUB_BLOCK_SIZE = 1f;
+        private void Awake()
+        {
+            blockPrefab.GetComponent<BoxCollider>().size = 3f * Config.subBlockSize * Vector3.one;
+        }
 
         public void Rebuild()
         {
             var buildingTypeByGlobalSmallCoordinate = new Dictionary<Vector3Int, BuildingType>();
             foreach (var (coordinate, id) in _subBlockIdsBySmallCoordinate)
             {
-                var subBlockType = (BuildingType)config.SubBlockTable.Rows.Find(id)[WfcConfig.BUILDING_COLUMN_INDEX];
+                var subBlockType = (BuildingType)Config.SubBlockTable.Rows.Find(id)[WfcConfig.BUILDING_COLUMN_INDEX];
                 Destroy(_subBlockGameObjectsBySmallCoordinate[coordinate]);
                 buildingTypeByGlobalSmallCoordinate.Add(coordinate, subBlockType);
             }
@@ -66,7 +70,7 @@ namespace WFC
                 var touchingNeighborBlockCoordinates = globalCoordinateOnNeighbourSide.GetSurrounding3x3Coordinates(direction);
 
                 var neighborId = _subBlockIdsBySmallCoordinate[touchingNeighborBlockCoordinates.First()]; // Todo: find a better way to do this
-                var neighborBuildingType = (BuildingType)config.SubBlockTable.Rows.Find(neighborId)[WfcConfig.BUILDING_COLUMN_INDEX];
+                var neighborBuildingType = (BuildingType)Config.SubBlockTable.Rows.Find(neighborId)[WfcConfig.BUILDING_COLUMN_INDEX];
                 
                 foreach (var touchingNeighborBlockCoordinate in touchingNeighborBlockCoordinates)
                 {
@@ -135,7 +139,7 @@ namespace WFC
                     _blockObjectByBigCoordinate.Add(parentBlockCoordinate, parentBlockObject);
                 }
 
-                var selectedSubBlockRow = config.SubBlockTable.Rows.Find(idToPlace);
+                var selectedSubBlockRow = Config.SubBlockTable.Rows.Find(idToPlace);
                 var selectedSubBlockType = (SubBlockType)selectedSubBlockRow[WfcConfig.TYPE_COLUMN_INDEX];
                 
                 var localSubBlockCoordinate = GetLocalSmallCoordinateFromGlobal(coordinateWithTheLeastPossibilities);
@@ -145,7 +149,7 @@ namespace WFC
                 var selectedPrefab = SelectRandomPrefabVariant(selectedSubBlockRow);
 
                 var newSubBlock = Instantiate(selectedPrefab, parentBlockObject.transform);
-                newSubBlock.transform.localPosition = (Vector3)localSubBlockCoordinate * SUB_BLOCK_SIZE;
+                newSubBlock.transform.localPosition = (Vector3)localSubBlockCoordinate * Config.subBlockSize;
                 newSubBlock.transform.rotation = Quaternion.Euler(0, subBlock90RotationsAroundY * 90, 0);
                 _subBlockGameObjectsBySmallCoordinate.Add(coordinateWithTheLeastPossibilities, newSubBlock);
                 _subBlockIdsBySmallCoordinate.Add(coordinateWithTheLeastPossibilities, idToPlace);
@@ -175,7 +179,7 @@ namespace WFC
             var probabilityThresholdsById = new Dictionary<int, float>();
             foreach (var id in subBlockIdsToSelectFrom)
             {
-                probabilityThresholdsById.Add(id, ((float[])config.SubBlockTable.Rows.Find(id)[WfcConfig.PROBABILITIES_COLUMN_INDEX]).Sum());
+                probabilityThresholdsById.Add(id, ((float[])Config.SubBlockTable.Rows.Find(id)[WfcConfig.PROBABILITIES_COLUMN_INDEX]).Sum());
             }
             var maxProbabilityValue = probabilityThresholdsById.Values.Sum();
             var randomSelectionValue = Random.Range(0, maxProbabilityValue);
@@ -217,7 +221,7 @@ namespace WFC
             var subBlockType = SubBlockUtils.GetTypeFromCoordinates(localCoordinate);
             var subBlock90RotationsAroundY =
                 subBlockType.GetDefaultCoordinate().Get90RotationsAroundYTo(localCoordinate);
-            var possibleSubBlockRows = config.SubBlockTable.AsEnumerable().Where(row =>
+            var possibleSubBlockRows = Config.SubBlockTable.AsEnumerable().Where(row =>
                 (BuildingType)row[WfcConfig.BUILDING_COLUMN_INDEX] == buildingType &&
                 (SubBlockType)row[WfcConfig.TYPE_COLUMN_INDEX] == subBlockType);
             
@@ -228,7 +232,7 @@ namespace WFC
                 if (_subBlockIdsBySmallCoordinate.TryGetValue(neighborCoordinate, out var neighborId))
                 {
                     var oppositeDirection = -direction;
-                    var neighborRow = config.SubBlockTable.Rows.Find(neighborId);
+                    var neighborRow = Config.SubBlockTable.Rows.Find(neighborId);
                     var neighborType = (SubBlockType)neighborRow[WfcConfig.TYPE_COLUMN_INDEX];
                     var localNeighborCoordinates = GetLocalSmallCoordinateFromGlobal(neighborCoordinate);
                     var neighbor90RotationsAroundY =
@@ -252,7 +256,7 @@ namespace WFC
                                 if (allowedId == WfcConfig.EMPTY_SUB_BLOCK_ID)
                                     return false;
                                 
-                                var allowedRow = config.SubBlockTable.Rows.Find(allowedId);
+                                var allowedRow = Config.SubBlockTable.Rows.Find(allowedId);
                                 var allowedBuildingType = (BuildingType)allowedRow[WfcConfig.BUILDING_COLUMN_INDEX];
                                 return allowedBuildingType == plannedNeighborBuildingType;
                             }));
@@ -270,18 +274,18 @@ namespace WFC
                 possibleSubBlockRows.Select(row => (int)row[WfcConfig.ID_COLUMN_INDEX]).ToList();
         }
 
-        private static Vector3Int WorldPositionToBigCoordinate(Vector3 worldPosition)
+        private Vector3Int WorldPositionToBigCoordinate(Vector3 worldPosition)
         {
-            var dividedPosition = worldPosition / (SUB_BLOCK_SIZE * 3f);
+            var dividedPosition = worldPosition / (Config.subBlockSize * 3f);
             return new Vector3Int(
                 Mathf.RoundToInt(dividedPosition.x), 
                 Mathf.RoundToInt(dividedPosition.y), 
                 Mathf.RoundToInt(dividedPosition.z));
         }
 
-        private static Vector3 BigCoordinateToWorldPosition(Vector3Int bigCoordinate)
+        private Vector3 BigCoordinateToWorldPosition(Vector3Int bigCoordinate)
         {
-            return (Vector3)bigCoordinate * (SUB_BLOCK_SIZE * 3f);
+            return (Vector3)bigCoordinate * (Config.subBlockSize * 3f);
         }
 
         private static Vector3Int SmallCoordinateToBigCoordinate(Vector3Int smallCoordinate)

@@ -54,6 +54,10 @@ namespace WFC.Editor
             _subBlockCountText = _root.Q<Label>("SubBlockCountText");
             _subBlockCountText.text = $"SubBlocks added: {((WfcConfig)target).SubBlockCount}";
             
+            var subBlockSizeField = _root.Q<FloatField>("SubBlockSizeField");
+            subBlockSizeField.value = ((WfcConfig)target).subBlockSize;
+            subBlockSizeField.RegisterCallback<ChangeEvent<float>>((evt) => ((WfcConfig)target).subBlockSize = evt.newValue);
+            
             _buildingFilterBar = _root.Q<ToggleBar>("BuildingFilterBar");
             foreach (BuildingType buildingType in Enum.GetValues(typeof(BuildingType)))
             {

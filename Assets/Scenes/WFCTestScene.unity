@@ -637,7 +637,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c1b929fae7c43858526deada07248e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  config: {fileID: 11400000, guid: 1faded38321b1d74e9a6762179b0b83d, type: 2}
+  <Config>k__BackingField: {fileID: 11400000, guid: 1faded38321b1d74e9a6762179b0b83d, type: 2}
   blockPrefab: {fileID: 3090540664009974295, guid: 7f5e5a6507ce9cb4b9529ad41914a4fa, type: 3}
   selection: {fileID: 1014177623}
 --- !u!4 &785276875
@@ -671,6 +671,7 @@ MonoBehaviour:
   previewBlock: {fileID: 1280573408}
   selection: {fileID: 1014177623}
   blockCreator: {fileID: 785276874}
+  groundTransform: {fileID: 1991255453}
 --- !u!1 &893085066
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace WFC.TestScene
 {
@@ -8,11 +9,18 @@ namespace WFC.TestScene
         [SerializeField] private GameObject previewBlock;
         [SerializeField] private BuildingSelection selection;
         [SerializeField] private WfcBlockCreator blockCreator;
+        [SerializeField] private Transform groundTransform;
 
         private Vector3Int _lastHoveredCoordinate;
 
-        private const float SUB_BLOCK_SIZE = 1f;
-        
+        private void Awake()
+        {
+            previewBlock.transform.localScale = Vector3.one * 3f * blockCreator.Config.subBlockSize;
+            var groundPosition = groundTransform.position;
+            groundPosition.y = - 1.5f * blockCreator.Config.subBlockSize - 0.5f;
+            groundTransform.position = groundPosition;
+        }
+
         private void OnEnable()
         {
             input.OnMouseClicked += HandleMouseClicked;
@@ -55,18 +63,18 @@ namespace WFC.TestScene
             blockCreator.BuildNewBlock(bigCoordinate);
         }
         
-        private static Vector3Int WorldPositionToBigCoordinate(Vector3 worldPosition)
+        private Vector3Int WorldPositionToBigCoordinate(Vector3 worldPosition)
         {
-            var dividedPosition = worldPosition / (SUB_BLOCK_SIZE * 3f);
+            var dividedPosition = worldPosition / (blockCreator.Config.subBlockSize * 3f);
             return new Vector3Int(
                 Mathf.RoundToInt(dividedPosition.x), 
                 Mathf.RoundToInt(dividedPosition.y), 
                 Mathf.RoundToInt(dividedPosition.z));
         }
         
-        private static Vector3 BigCoordinateToWorldPosition(Vector3Int bigCoordinate)
+        private Vector3 BigCoordinateToWorldPosition(Vector3Int bigCoordinate)
         {
-            return (Vector3)bigCoordinate * (SUB_BLOCK_SIZE * 3f);
+            return (Vector3)bigCoordinate * (blockCreator.Config.subBlockSize * 3f);
         }
     }
 }

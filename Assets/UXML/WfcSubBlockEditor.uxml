@@ -1,12 +1,13 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
-    <Style src="project://database/Assets/UXML/WfcEditorStyles.uss?fileID=7433441132597879392&amp;guid=d7a190f3ca5c08149add1bd42dae204c&amp;type=3#WfcEditorStyles" />
-    <Style src="project://database/Assets/UXML/SwitchStyles.uss?fileID=7433441132597879392&amp;guid=99feeab80a075d94ea70f64a9857db72&amp;type=3#SwitchStyles" />
-    <Style src="project://database/Assets/UXML/ToggleStyles.uss?fileID=7433441132597879392&amp;guid=85cf75ec90d19604b9f7bd93f7c7f0e2&amp;type=3#ToggleStyles" />
+    <Style src="project://database/Assets/USS/WfcEditorStyles.uss?fileID=7433441132597879392&amp;guid=d7a190f3ca5c08149add1bd42dae204c&amp;type=3#WfcEditorStyles" />
+    <Style src="project://database/Assets/USS/SwitchStyles.uss?fileID=7433441132597879392&amp;guid=99feeab80a075d94ea70f64a9857db72&amp;type=3#SwitchStyles" />
+    <Style src="project://database/Assets/USS/ToggleStyles.uss?fileID=7433441132597879392&amp;guid=85cf75ec90d19604b9f7bd93f7c7f0e2&amp;type=3#ToggleStyles" />
     <ui:VisualElement name="MainContainer" style="flex-grow: 1;">
         <ui:VisualElement name="VisualElement" style="flex-grow: 0; flex-direction: row; align-items: center; justify-content: space-between;">
             <ui:Label text="SubBlocks added: 0" name="SubBlockCountText" style="margin-top: 10px; margin-bottom: 10px; margin-left: 10px; -unity-font-style: bold; font-size: 16px;" />
             <ui:Button text="Add SubBlock" name="AddSubBlockButton" style="font-size: 14px; padding-top: 3px; padding-right: 9px; padding-bottom: 3px; padding-left: 9px; margin-right: 10px;" />
         </ui:VisualElement>
+        <ui:FloatField label="SubBlock size" value="1" name="SubBlockSizeField" />
         <WFC.ToggleBar name="BuildingFilterBar" style="margin-top: 15px; margin-bottom: 10px;" />
         <WFC.ToggleBar name="SubBlockTypeFilterBar" style="margin-bottom: 15px;" />
         <ui:VisualElement name="SubBlockListContainer" style="flex-grow: 1;">

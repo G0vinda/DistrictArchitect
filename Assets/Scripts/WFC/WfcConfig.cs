@@ -11,6 +11,7 @@ namespace WFC
     public class WfcConfig : ScriptableObject, ISerializationCallbackReceiver
     {
         public DataTable SubBlockTable { get; private set; } = new();
+        public float subBlockSize;
         
         public int SubBlockCount => SubBlockTable != null ? SubBlockTable.Rows.Count : 0;
         
