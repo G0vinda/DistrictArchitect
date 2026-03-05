@@ -15,7 +15,8 @@ public class FbxToPrefabConverter : EditorWindow
     [MenuItem("Tools/Fbx To Prefab Converter")]
     public static void ShowWindow()
     {
-        GetWindow<FbxToPrefabConverter>();
+        var converterWindow = CreateInstance<FbxToPrefabConverter>();
+        converterWindow.ShowModal();
     }
         
     public void CreateGUI()
