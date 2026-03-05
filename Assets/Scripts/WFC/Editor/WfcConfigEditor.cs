@@ -102,7 +102,12 @@ namespace WFC.Editor
             _subBlockListView.bindItem = (element, i) =>
             {
                 var nameLabel = element.Q<Label>("PrefabNameLabel");
-                var subBlockPrefabs = (GameObject[])_filteredSubBlockList.ElementAt(i)[WfcConfig.PREFAB_COLUMN_INDEX];
+                var typeTag = element.Q<VisualElement>("SubBlockTypeTag");
+                var typeTagLabel = element.Q<Label>("SubBlockTypeTagLabel");
+
+                var subBlockRow = _filteredSubBlockList.ElementAt(i);
+                
+                var subBlockPrefabs = (GameObject[])subBlockRow[WfcConfig.PREFAB_COLUMN_INDEX];
                 if (subBlockPrefabs[0])
                 {
                     nameLabel.text = subBlockPrefabs[0].name;
@@ -120,7 +125,28 @@ namespace WFC.Editor
                 SetCallbackToListElementButton(element, () => OnAddVariantToSubBlockClicked(i), "AddVariantButton");
                 SetCallbackToListElementButton(element, () => OnDeleteSubBlockClicked(element, i), "DeleteButton");
 
-                var subBlockType = (SubBlockType)_filteredSubBlockList.ElementAt(i)[WfcConfig.TYPE_COLUMN_INDEX];
+                var subBlockType = (SubBlockType)subBlockRow[WfcConfig.TYPE_COLUMN_INDEX];
+                switch (subBlockType.GetDefaultCoordinate().y)
+                {
+                    case -1:
+                        typeTag.EnableInClassList("sub-block-type-tag-bottom", true);
+                        typeTag.EnableInClassList("sub-block-type-tag-middle", false);
+                        typeTag.EnableInClassList("sub-block-type-tag-top", false);
+                        break;
+                    case 0:
+                        typeTag.EnableInClassList("sub-block-type-tag-bottom", false);
+                        typeTag.EnableInClassList("sub-block-type-tag-middle", true);
+                        typeTag.EnableInClassList("sub-block-type-tag-top", false);
+                        break;
+                    case 1:
+                        typeTag.EnableInClassList("sub-block-type-tag-bottom", false);
+                        typeTag.EnableInClassList("sub-block-type-tag-middle", false);
+                        typeTag.EnableInClassList("sub-block-type-tag-top", true);
+                        break;
+                }
+
+                typeTagLabel.text = subBlockType.GetAbbreviation();
+                
                 if (subBlockType is SubBlockType.BottomCorner or SubBlockType.TopCorner or SubBlockType.MiddleEdge)
                 {
                     var mirrorButton = element.Q<Button>("MirrorButton");

@@ -45,5 +45,22 @@ namespace WFC
             
             return outwardFacingDirections;
         }
+
+        public static string GetAbbreviation(this SubBlockType type)
+        {
+            return type switch
+            {
+                SubBlockType.TopCorner => "TC",
+                SubBlockType.BottomCorner => "BC",
+                SubBlockType.TopEdge => "TE",
+                SubBlockType.MiddleEdge => "ME",
+                SubBlockType.BottomEdge => "BE",
+                SubBlockType.TopFace => "TF",
+                SubBlockType.MiddleFace => "MF",
+                SubBlockType.BottomFace => "BF",
+                SubBlockType.Center => "C",
+                _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+            };
+        }
     }
 }

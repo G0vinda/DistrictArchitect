@@ -1,10 +1,15 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
-    <Style src="project://database/Assets/UXML/WfcEditorStyles.uss?fileID=7433441132597879392&amp;guid=d7a190f3ca5c08149add1bd42dae204c&amp;type=3#WfcEditorStyles" />
+    <Style src="project://database/Assets/USS/WfcEditorStyles.uss?fileID=7433441132597879392&amp;guid=d7a190f3ca5c08149add1bd42dae204c&amp;type=3#WfcEditorStyles" />
     <ui:VisualElement name="MainContainer" class="sub-block-list-element">
         <ui:VisualElement name="HorizontalContainer" style="flex-grow: 1; flex-direction: row; align-items: flex-start; justify-content: flex-end; padding-right: 10px;">
             <ui:VisualElement name="PreviewImageContainer" style="flex-grow: 0; margin-top: 3px; margin-right: 3px; margin-bottom: 3px; margin-left: 3px; min-width: 50px; min-height: 50px;" />
             <ui:VisualElement name="TextContainer" style="flex-grow: 1; margin-left: 15px; justify-content: flex-start; align-items: flex-start; min-width: auto; min-height: 45px; display: flex;">
-                <ui:Label text="PrefabName" name="PrefabNameLabel" style="flex-grow: 1; margin-left: 0; -unity-text-align: middle-left; margin-top: 8px;" />
+                <ui:VisualElement name="HorizontalContainer" style="flex-grow: 0; flex-direction: row; margin-top: 8px;">
+                    <ui:Label text="PrefabName" name="PrefabNameLabel" style="flex-grow: 1; margin-left: 0; -unity-text-align: middle-left; margin-top: 0;" />
+                    <ui:VisualElement name="SubBlockTypeTag" class="sub-block-type-tag-bottom">
+                        <ui:Label text="TC" name="SubBlockTypeTagLabel" style="-unity-text-align: middle-left;" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
                 <ui:Label text="VariantCount" name="VariantCountLabel" style="flex-grow: 1; -unity-text-align: upper-left; color: rgba(210, 210, 210, 0.6); font-size: 10px;" />
             </ui:VisualElement>
             <ui:VisualElement name="VariantContainer" class="variant-list" style="flex-grow: 1; display: none;" />
