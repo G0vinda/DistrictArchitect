@@ -1,0 +1,30 @@
+.border {
+    width: 45px;
+    height: 26px;
+    background-color: rgb(27, 27, 27);
+    border-radius: 13px;
+    border-width: 2px;
+    border-color: rgb(161, 160, 160);
+    justify-content: flex-start;
+    align-self: center;
+    flex-direction: row;
+    margin-top: 3px;
+    margin-bottom: 3px;
+}
+
+.control {
+    width: 18px;
+    height: 18px;
+    background-color: rgb(145, 145, 145);
+    border-radius: 10px;
+    margin: 2px;
+}
+
+.border-on {
+    flex-direction: row;
+    justify-content: flex-end;
+}
+
+.border-on > .control {
+    background-color: rgb(212, 212, 212);
+}

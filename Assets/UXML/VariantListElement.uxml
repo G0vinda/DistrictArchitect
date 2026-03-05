@@ -1,0 +1,10 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Assets/UXML/WfcEditorStyles.uss?fileID=7433441132597879392&amp;guid=d7a190f3ca5c08149add1bd42dae204c&amp;type=3#WfcEditorStyles" />
+    <ui:VisualElement name="VariantListElement" class="variant-list-element" style="flex-grow: 0; flex-direction: row; align-items: center;">
+        <ui:VisualElement name="PreviewImageContainer" style="flex-grow: 0; min-width: 40px; min-height: 40px;" />
+        <ui:Label text="Name" name="NameLabel" style="flex-grow: 1; margin-left: 5px;" />
+        <ui:Label text="Probability:" name="ProbabilityLabel" />
+        <ui:FloatField value="1" name="ProbabilityField" style="min-width: 25px;" />
+        <ui:Button text="Delete" name="DeleteButton" style="margin-left: 5px;" />
+    </ui:VisualElement>
+</ui:UXML>

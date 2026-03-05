@@ -84,10 +84,10 @@ public class Grid
     {
         dayCount++;
         
-        var eatenFood = peopleCount / PEOPLE_PER_FOOD;
-        eatenFood += peopleCount % PEOPLE_PER_FOOD != 0 ? 1 : 0;
-        foodCount -= eatenFood;
-        Debug.Log(peopleCount + " people eat " + eatenFood + " food!");
+        // var eatenFood = peopleCount / PEOPLE_PER_FOOD;
+        // eatenFood += peopleCount % PEOPLE_PER_FOOD != 0 ? 1 : 0;
+        // foodCount -= eatenFood;
+        //Debug.Log(peopleCount + " people eat " + eatenFood + " food!");
 
         if (dayCount % 7 == 0)
         {

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using DefaultNamespace;
 using UnityEngine;
 
 public abstract class Building : MonoBehaviour

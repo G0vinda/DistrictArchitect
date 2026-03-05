@@ -2,10 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using NUnit.Framework;
-using Sirenix.OdinInspector;
 using UnityEditor;
-using UnityEditor.Build.Content;
 using UnityEngine;
 
 namespace WFC
@@ -15,13 +12,15 @@ namespace WFC
     {
         public DataTable SubBlockTable { get; private set; } = new();
         
+        public int SubBlockCount => SubBlockTable != null ? SubBlockTable.Rows.Count : 0;
+        
         public Action SubBlockTableUpdated;
 
         [SerializeField] private int[] serializedIds;
         [SerializeField] private BuildingType[] serializedBuildingTypes;
         [SerializeField] private SubBlockType[] serializedTypes;
-        [SerializeField] private GameObject[] serializedPrefabs;
-        [SerializeField] private float[] serializedProbabilities;
+        [SerializeField] private SerializedPrefabArray[] serializedPrefabs;
+        [SerializeField] private SerializedProbabilityArray[] serializedProbabilities;
         [SerializeField] private SerializedAllowedNeighborArrays[] serializedNeighborArrays;
         
         private bool _subBlockTableIsDirty = true;
@@ -32,7 +31,7 @@ namespace WFC
         public const int BUILDING_COLUMN_INDEX = 1;
         public const int TYPE_COLUMN_INDEX = 2;
         public const int PREFAB_COLUMN_INDEX = 3;
-        public const int PROBABILITY_COLUMN_INDEX = 4;
+        public const int PROBABILITIES_COLUMN_INDEX = 4;
 
         public static readonly Dictionary<Vector3Int, int> NEIGHBOR_COLUMN_INDEX_BY_DIRECTION = new()
         {
@@ -50,77 +49,130 @@ namespace WFC
                 SetupSubBlockTable();
         }
 
-        public int GetSubBlockCount() => SubBlockTable != null ? SubBlockTable.Rows.Count : 0;
-
-        public void AddSubBlock(BuildingType buildingType, SubBlockType newSubBlockType, GameObject prefab, float probability)
+        public void AddSubBlock(BuildingType newSubBlockBuildingType, SubBlockType newSubBlockType, GameObject prefab, float probability)
         {
             var newSubBlockRow = SubBlockTable.NewRow();
-            newSubBlockRow[BUILDING_COLUMN_INDEX] = buildingType;
+            newSubBlockRow[BUILDING_COLUMN_INDEX] = newSubBlockBuildingType;
             newSubBlockRow[TYPE_COLUMN_INDEX] = newSubBlockType;
-            newSubBlockRow[PREFAB_COLUMN_INDEX] = prefab;
-            newSubBlockRow[PROBABILITY_COLUMN_INDEX] = probability;
+            newSubBlockRow[PREFAB_COLUMN_INDEX] = new[] { prefab };
+            newSubBlockRow[PROBABILITIES_COLUMN_INDEX] = new[] { probability };
             SubBlockTable.Rows.Add(newSubBlockRow);
             var newSubBlockId = (int)newSubBlockRow[ID_COLUMN_INDEX]; 
                 
             var enumerableSubBlockRows = SubBlockTable.AsEnumerable();
-            var allDirections = Vector3Int.zero.Neighbours();
-            foreach (var direction in allDirections)
+            var outwardFacingDirections = newSubBlockType.GetOutwardFacingDirections();
+            foreach (var direction in Vector3IntUtils.Directions)
             {
-                newSubBlockRow[NEIGHBOR_COLUMN_INDEX_BY_DIRECTION[direction]] = new[] { EMPTY_SUB_BLOCK_ID };
-                // var neighborTypeInDirection = newSubBlockType.GetNeighborTypeInDirection(direction);
-                // var subBlocksWithMatchingType = enumerableSubBlockRows
-                //     .Where(row => (SubBlockType)row[TYPE_COLUMN_INDEX] == neighborTypeInDirection)
-                //     .Select(row => (int)row[ID_COLUMN_INDEX]).ToArray();
-                // newSubBlockRow[NEIGHBOR_COLUMN_INDEX_BY_DIRECTION[direction]] = subBlocksWithMatchingType;
-                //
-                // var oppositeDirection = direction * -1;
-                // if (neighborTypeInDirection.GetNeighborTypeInDirection(oppositeDirection) != newSubBlockType)
-                //     continue;
-                //
-                // foreach (var neighborId in subBlocksWithMatchingType)
-                // {
-                //     if (neighborId == newSubBlockId)
-                //         continue;
-                //     
-                //     var neighborRow = SubBlockTable.Rows.Find(neighborId);
-                //
-                //     var neighborsAllowedNeighbors =
-                //         (int[])neighborRow[NEIGHBOR_COLUMN_INDEX_BY_DIRECTION[oppositeDirection]];
-                //     var extendedAllowedNeighbors = new int[neighborsAllowedNeighbors.Length + 1];
-                //     Array.Copy(neighborsAllowedNeighbors, extendedAllowedNeighbors, neighborsAllowedNeighbors.Length);
-                //     
-                //     extendedAllowedNeighbors[^1] = newSubBlockId;
-                //     neighborRow[NEIGHBOR_COLUMN_INDEX_BY_DIRECTION[oppositeDirection]] = extendedAllowedNeighbors;
-                // }
+                var neighborTypeInDirection = newSubBlockType.GetNeighborTypeInDirection(direction);
+                int[] matchingNeighborSubBlockIds;
+                if (outwardFacingDirections.Contains(direction))
+                {
+                    var matchingNeighborSubBlockIdsList = enumerableSubBlockRows
+                        .Where(row => (SubBlockType)row[TYPE_COLUMN_INDEX] == neighborTypeInDirection)
+                        .Select(row => (int)row[ID_COLUMN_INDEX]).ToList();
+                    matchingNeighborSubBlockIdsList.Add(EMPTY_SUB_BLOCK_ID);
+                    matchingNeighborSubBlockIds = matchingNeighborSubBlockIdsList.ToArray();
+                }
+                else
+                {
+                    matchingNeighborSubBlockIds = enumerableSubBlockRows
+                        .Where(row => (SubBlockType)row[TYPE_COLUMN_INDEX] == neighborTypeInDirection && (BuildingType)row[BUILDING_COLUMN_INDEX] == newSubBlockBuildingType )
+                        .Select(row => (int)row[ID_COLUMN_INDEX]).ToArray();
+                }
+                
+                newSubBlockRow[NEIGHBOR_COLUMN_INDEX_BY_DIRECTION[direction]] = matchingNeighborSubBlockIds;
             }
+            
+            AdjustExistingNeighborsToNewSubBlock(newSubBlockBuildingType, newSubBlockType, newSubBlockId);
             
             MarkTableAsDirty();
         }
 
-        public void RemoveSubBlock(int id)
+        public void RemoveSubBlock(int idToRemove)
         {
-            var rowToRemove = SubBlockTable.Rows.Find(id);
+            var rowToRemove = SubBlockTable.Rows.Find(idToRemove);
+            var enumerableSubBlockRows = SubBlockTable.AsEnumerable();
             var typeOfSubBlockToRemove = (SubBlockType)rowToRemove[TYPE_COLUMN_INDEX];
-            var allDirections = Vector3Int.zero.Neighbours();
-            foreach (var direction in allDirections)
+            foreach (SubBlockType subBlockType in Enum.GetValues(typeof(SubBlockType)))
             {
-                var neighborTypeInDirection = typeOfSubBlockToRemove.GetNeighborTypeInDirection(direction);
-                if (neighborTypeInDirection.GetNeighborTypeInDirection(-direction) != typeOfSubBlockToRemove)
-                    continue;
-                
-                var allowedNeighborsInDirectionRowValue = rowToRemove[NEIGHBOR_COLUMN_INDEX_BY_DIRECTION[direction]];
-                if (allowedNeighborsInDirectionRowValue == null)
-                    continue;
-                
-                var allowedNeighborsInDirection = (int[])allowedNeighborsInDirectionRowValue;
-                foreach (var allowedNeighborId in allowedNeighborsInDirection)
+                EnumerableRowCollection<DataRow> rowsWithSubBlockType = null;
+                foreach (var direction in Vector3IntUtils.Directions)
                 {
-                    RemoveAllowedNeighborUnidirectional(id, allowedNeighborId, -direction);
+                    if (subBlockType.GetNeighborTypeInDirection(direction) != typeOfSubBlockToRemove)
+                        continue;
+                    
+                    rowsWithSubBlockType ??=
+                        enumerableSubBlockRows.Where(row => (SubBlockType)row[TYPE_COLUMN_INDEX] == subBlockType);
+                    
+                    foreach (var neighborRow in rowsWithSubBlockType)
+                    {
+                        var allowedNeighbors = ((int[])neighborRow[NEIGHBOR_COLUMN_INDEX_BY_DIRECTION[direction]]).ToList();
+                        allowedNeighbors.Remove(idToRemove);
+                        neighborRow[NEIGHBOR_COLUMN_INDEX_BY_DIRECTION[direction]] = allowedNeighbors.ToArray();
+                    }
                 }
             }
             SubBlockTable.Rows.Remove(rowToRemove);
             
             MarkTableAsDirty();
+        }
+
+        public void AddSubBlockVariant(int idToAddTo, GameObject variantPrefab, float probability)
+        {
+            var subBlockToAddTo = SubBlockTable.Rows.Find(idToAddTo);
+                
+            var prefabList = ((GameObject[])subBlockToAddTo[PREFAB_COLUMN_INDEX]).ToList();
+            prefabList.Add(variantPrefab);
+            subBlockToAddTo[PREFAB_COLUMN_INDEX] = prefabList.ToArray();
+
+            var probabilityList = ((float[])subBlockToAddTo[PROBABILITIES_COLUMN_INDEX]).ToList();
+            probabilityList.Add(probability);
+            subBlockToAddTo[PROBABILITIES_COLUMN_INDEX] = probabilityList.ToArray();
+
+            MarkTableAsDirty();
+        }
+
+        public void RemoveSubBlockVariant(int idToRemoveFrom, int variantIndexToRemove)
+        {
+            var subBlockToRemoveFrom = SubBlockTable.Rows.Find(idToRemoveFrom);
+            
+            var prefabList = ((GameObject[])subBlockToRemoveFrom[PREFAB_COLUMN_INDEX]).ToList();
+            prefabList.RemoveAt(variantIndexToRemove);
+            subBlockToRemoveFrom[PREFAB_COLUMN_INDEX] = prefabList.ToArray();
+
+            var probabilityList = ((float[])subBlockToRemoveFrom[PROBABILITIES_COLUMN_INDEX]).ToList();
+            probabilityList.RemoveAt(variantIndexToRemove);
+            subBlockToRemoveFrom[PROBABILITIES_COLUMN_INDEX] = probabilityList.ToArray();
+            
+            MarkTableAsDirty();
+        }
+
+        public void ChangeSubBlockVariantProbability(int subBlockIdToChange, int variantIndexToChange,
+            float newProbability)
+        {
+            var subBlockToChange = SubBlockTable.Rows.Find(subBlockIdToChange);
+            ((float[])subBlockToChange[PROBABILITIES_COLUMN_INDEX])[variantIndexToChange] = newProbability;
+            
+            MarkTableAsDirty(false);
+        }
+        
+        public void AddAllowedNeighbor(int idToAdd, int idToAddTo, Vector3Int directionToAddTo)
+        {
+            AddAllowedNeighborUnidirectional(idToAdd, idToAddTo, directionToAddTo);
+            if (idToAdd != idToAddTo && idToAdd >= 0)
+            {
+                var typeToAdd = (SubBlockType)SubBlockTable.Rows.Find(idToAdd)[TYPE_COLUMN_INDEX];
+                var typeToAddTo = (SubBlockType)SubBlockTable.Rows.Find(idToAddTo)[TYPE_COLUMN_INDEX];
+                
+                var allowedNeighborCoordinate = (typeToAddTo.GetDefaultCoordinate() + directionToAddTo).GetWrappedNeg1To1();
+                var allowedNeighbor90Rotations =
+                    typeToAdd.GetDefaultCoordinate().Get90RotationsAroundYTo(allowedNeighborCoordinate);
+                var allowedNeighborDirectionToOrigin = -directionToAddTo.Rotate90(Vector3Int.up, -allowedNeighbor90Rotations);
+                
+                AddAllowedNeighborUnidirectional(idToAddTo, idToAdd, allowedNeighborDirectionToOrigin);
+            }
+            
+            MarkTableAsDirty(false);
         }
 
         public void RemoveAllowedNeighbor(int idToRemove, int idToRemoveFrom, Vector3Int directionToRemoveFrom)
@@ -129,33 +181,34 @@ namespace WFC
             
             if (idToRemove != idToRemoveFrom && idToRemove >= 0)
             {
-                var oppositeDirection = -directionToRemoveFrom;
                 var typeToRemove = (SubBlockType)SubBlockTable.Rows.Find(idToRemove)[TYPE_COLUMN_INDEX];
                 var typeToRemoveFrom = (SubBlockType)SubBlockTable.Rows.Find(idToRemoveFrom)[TYPE_COLUMN_INDEX];
-                if (typeToRemove.GetNeighborTypeInDirection(oppositeDirection) == typeToRemoveFrom)
-                {
-                    RemoveAllowedNeighborUnidirectional(idToRemoveFrom, idToRemove, oppositeDirection);
-                }
+                
+                var allowedNeighborCoordinate = (typeToRemoveFrom.GetDefaultCoordinate() + directionToRemoveFrom).GetWrappedNeg1To1();
+                var allowedNeighbor90Rotations =
+                    typeToRemove.GetDefaultCoordinate().Get90RotationsAroundYTo(allowedNeighborCoordinate);
+                var allowedNeighborDirectionToOrigin = -directionToRemoveFrom.Rotate90(Vector3Int.up, -allowedNeighbor90Rotations);
+                
+                RemoveAllowedNeighborUnidirectional(idToRemoveFrom, idToRemove, allowedNeighborDirectionToOrigin);
             }
             
             MarkTableAsDirty(false);
         }
-
-        public void AddAllowedNeighbor(int idToAdd, int idToAddTo, Vector3Int directionToAddTo)
+        
+        public bool DoesPrefabExistInDatabase(GameObject prefab)
         {
-            AddAllowedNeighborUnidirectional(idToAdd, idToAddTo, directionToAddTo);
-            if (idToAdd != idToAddTo && idToAdd >= 0)
-            {
-                var oppositeDirection = -directionToAddTo;
-                var typeToAdd = (SubBlockType)SubBlockTable.Rows.Find(idToAdd)[TYPE_COLUMN_INDEX];
-                var typeToAddTo = (SubBlockType)SubBlockTable.Rows.Find(idToAddTo)[TYPE_COLUMN_INDEX];
-                if (typeToAdd.GetNeighborTypeInDirection(oppositeDirection) == typeToAddTo)
-                {
-                    AddAllowedNeighborUnidirectional(idToAddTo, idToAdd, oppositeDirection);
-                }
-            }
-            
-            MarkTableAsDirty(false);
+            return SubBlockTable.AsEnumerable().Any(row => Array.Exists((GameObject[])row[PREFAB_COLUMN_INDEX],p => p == prefab));
+        }
+        
+        private void AddAllowedNeighborUnidirectional(int idToAdd, int idToAddTo, Vector3Int directionToAddTo)
+        {
+            var rowToAddTo = SubBlockTable.Rows.Find(idToAddTo);
+            var neighborColumnId = NEIGHBOR_COLUMN_INDEX_BY_DIRECTION[directionToAddTo];
+            var originalNeighborsRowValue = rowToAddTo[neighborColumnId]; 
+            var originalNeighbors = originalNeighborsRowValue != null ? ((int[])originalNeighborsRowValue).ToList() : new List<int>();
+            var newNeighbors = originalNeighbors.ToList();
+            newNeighbors.Add(idToAdd);
+            rowToAddTo[neighborColumnId] = newNeighbors.ToArray();
         }
 
         private void RemoveAllowedNeighborUnidirectional(int idToRemove, int idToRemoveFrom,
@@ -176,34 +229,33 @@ namespace WFC
             rowToRemoveFrom[neighborColumnId] = newNeighbors.ToArray();
             MarkTableAsDirty(false);
         }
-
-        private void AddAllowedNeighborUnidirectional(int idToAdd, int idToAddTo, Vector3Int directionToAddTo)
-        {
-            var rowToAddTo = SubBlockTable.Rows.Find(idToAddTo);
-            var neighborColumnId = NEIGHBOR_COLUMN_INDEX_BY_DIRECTION[directionToAddTo];
-            var originalNeighborsRowValue = rowToAddTo[neighborColumnId]; 
-            var originalNeighbors = originalNeighborsRowValue != null ? ((int[])originalNeighborsRowValue).ToList() : new List<int>();
-            var newNeighbors = originalNeighbors.ToList();
-            newNeighbors.Add(idToAdd);
-            rowToAddTo[neighborColumnId] = newNeighbors.ToArray();
-        }
-
-        public GameObject GetSubBlockPrefabForType(SubBlockType type)
-        {
-            return (GameObject)SubBlockTable.AsEnumerable().First(row => (SubBlockType)row[TYPE_COLUMN_INDEX] == type)[PREFAB_COLUMN_INDEX];
-        }
-
-        public bool DoesPrefabExistInDatabase(GameObject prefab)
-        {
-            return SubBlockTable.AsEnumerable().Any(row => (GameObject)row[PREFAB_COLUMN_INDEX] == prefab);
-        }
         
-        [ContextMenu("Print All SubBlocks")]
-        private void PrintAllSubBlocks()
+        private void AdjustExistingNeighborsToNewSubBlock(BuildingType newSubBlockBuildingType, SubBlockType newSubBlockType,
+            int newSubBlockId)
         {
-            foreach (DataRow row in SubBlockTable.Rows)
+            var enumerableSubBlockRows = SubBlockTable.AsEnumerable();
+            foreach (SubBlockType subBlockType in Enum.GetValues(typeof(SubBlockType)))
             {
-                Debug.Log($"{row[ID_COLUMN_INDEX]}, {(SubBlockType)row[TYPE_COLUMN_INDEX]}: {((GameObject)row[PREFAB_COLUMN_INDEX]).name}");
+                List<DataRow> matchingTypeRows = null;
+                var neighborOutwardFacingDirections = subBlockType.GetOutwardFacingDirections();
+                foreach (var direction in Vector3IntUtils.Directions)
+                {
+                    if (subBlockType.GetNeighborTypeInDirection(direction) != newSubBlockType)
+                        continue;
+
+                    var directionIsFacingOutwards = neighborOutwardFacingDirections.Contains(direction);
+
+                    matchingTypeRows ??=
+                        enumerableSubBlockRows.Where(row => (SubBlockType)row[TYPE_COLUMN_INDEX] == subBlockType).ToList();
+                    
+                    foreach (var matchingTypeRow in matchingTypeRows)
+                    {
+                        if (!directionIsFacingOutwards && (BuildingType)matchingTypeRow[BUILDING_COLUMN_INDEX] != newSubBlockBuildingType)
+                            continue;
+                        
+                        AddAllowedNeighborUnidirectional(newSubBlockId, (int)matchingTypeRow[ID_COLUMN_INDEX], direction);
+                    }
+                }   
             }
         }
         
@@ -222,10 +274,8 @@ namespace WFC
             var typeColumn = AddNewColumnToSubBlockTable("Type", typeof(SubBlockType), TYPE_COLUMN_INDEX);
             typeColumn.ReadOnly = true;
             
-            var prefabColumn = AddNewColumnToSubBlockTable("Prefab", typeof(GameObject), PREFAB_COLUMN_INDEX);
-            prefabColumn.ReadOnly = true;
-            
-            AddNewColumnToSubBlockTable("Probability", typeof(float), PROBABILITY_COLUMN_INDEX);
+            AddNewColumnToSubBlockTable("Prefabs", typeof(GameObject[]), PREFAB_COLUMN_INDEX);
+            AddNewColumnToSubBlockTable("Probabilities", typeof(float[]), PROBABILITIES_COLUMN_INDEX);
             
             foreach (var (direction, allowedNeighborColumnIndex) in NEIGHBOR_COLUMN_INDEX_BY_DIRECTION)
             {
@@ -253,8 +303,8 @@ namespace WFC
             serializedIds = new int[rowCount];
             serializedBuildingTypes = new BuildingType[rowCount];
             serializedTypes = new SubBlockType[rowCount];
-            serializedPrefabs = new GameObject[rowCount];
-            serializedProbabilities = new float[rowCount];
+            serializedPrefabs = new SerializedPrefabArray[rowCount];
+            serializedProbabilities = new SerializedProbabilityArray[rowCount];
             serializedNeighborArrays = new SerializedAllowedNeighborArrays[rowCount];
             
             for (var i = 0; i < SubBlockTable.Rows.Count; i++)
@@ -262,8 +312,8 @@ namespace WFC
                 serializedIds[i] = (int)SubBlockTable.Rows[i][ID_COLUMN_INDEX];
                 serializedBuildingTypes[i] = (BuildingType)SubBlockTable.Rows[i][BUILDING_COLUMN_INDEX];
                 serializedTypes[i] = (SubBlockType)SubBlockTable.Rows[i][TYPE_COLUMN_INDEX];
-                serializedPrefabs[i] = (GameObject)SubBlockTable.Rows[i][PREFAB_COLUMN_INDEX];
-                serializedProbabilities[i] = (float)SubBlockTable.Rows[i][PROBABILITY_COLUMN_INDEX];
+                serializedPrefabs[i] = new SerializedPrefabArray((GameObject[])SubBlockTable.Rows[i][PREFAB_COLUMN_INDEX]);
+                serializedProbabilities[i] = new SerializedProbabilityArray((float[])SubBlockTable.Rows[i][PROBABILITIES_COLUMN_INDEX]);
                 serializedNeighborArrays[i] = new SerializedAllowedNeighborArrays();
                 foreach (var (direction, columnIndex) in NEIGHBOR_COLUMN_INDEX_BY_DIRECTION)
                 {
@@ -298,8 +348,8 @@ namespace WFC
                 row[ID_COLUMN_INDEX] = serializedIds[i];
                 row[BUILDING_COLUMN_INDEX] = serializedBuildingTypes[i];
                 row[TYPE_COLUMN_INDEX] = serializedTypes[i];
-                row[PREFAB_COLUMN_INDEX] = serializedPrefabs[i];
-                row[PROBABILITY_COLUMN_INDEX] = serializedProbabilities[i];
+                row[PREFAB_COLUMN_INDEX] = serializedPrefabs[i].value;
+                row[PROBABILITIES_COLUMN_INDEX] = serializedProbabilities[i].value;
                 foreach (var (direction, columnIndex) in NEIGHBOR_COLUMN_INDEX_BY_DIRECTION)
                 {
                     row[columnIndex] = serializedNeighborArrays[i][direction];
@@ -335,6 +385,28 @@ namespace WFC
                    serializedIds.Length == serializedPrefabs.Length &&
                    serializedIds.Length == serializedProbabilities.Length &&
                    serializedIds.Length == serializedNeighborArrays.Length;
+        }
+
+        [Serializable]
+        private class SerializedPrefabArray
+        {
+            public GameObject[] value;
+
+            public SerializedPrefabArray(GameObject[] prefabs)
+            {
+                value = prefabs;
+            }
+        }
+
+        [Serializable]
+        private class SerializedProbabilityArray
+        {
+            public float[] value;
+
+            public SerializedProbabilityArray(float[] probabilities)
+            {
+                value = probabilities;
+            }
         }
 
         [Serializable]

@@ -6,214 +6,42 @@ namespace WFC
 {
     public static class SubBlockUtils
     {
-        public static SubBlockType GetTypeFromCoordinate(Vector3Int coordinate)
+        public static SubBlockType GetTypeFromCoordinates(Vector3Int coordinates)
         {
-            switch (coordinate)
+            var crossSum = Math.Abs(coordinates.x) + Math.Abs(coordinates.y) + Math.Abs(coordinates.z);
+            if (crossSum == 0) // Center
             {
-                case {x: 0, y: 0, z: 0}:
-                    return SubBlockType.Center;
-                case {x: 0, y: 1, z: 0}:
-                    return SubBlockType.TopFace;
-                case {x: 0, y: 0, z: 1}:
-                case {x: 0, y: 0, z: -1}:
-                case {x: 1, y: 0, z: 0}:
-                case {x: -1, y: 0, z: 0}:
-                    return SubBlockType.MiddleFace;
-                case {x: 0, y: -1, z: 0}:
-                    return SubBlockType.BottomFace;
-                case {x: 1, y: 1, z: 1}:
-                case {x: 1, y: 1, z: -1}:
-                case {x: -1, y: 1, z: -1}:
-                case {x: -1, y: 1, z: 1}:
-                    return SubBlockType.TopCorner;
-                case {x: 1, y: -1, z: -1}:
-                case {x: 1, y: -1, z: 1}:
-                case {x: -1, y: -1, z: -1}:
-                case {x: -1, y: -1, z: 1}:
-                    return SubBlockType.BottomCorner;
-                case {x: 0, y: 1, z: -1}:
-                case {x: 0, y: 1, z: 1}:
-                case {x: 1, y: 1, z: 0}:
-                case {x: -1, y: 1, z: 0}:
-                    return SubBlockType.TopEdge;
-                case {x: 1, y: 0, z: -1}:
-                case {x: 1, y: 0, z: 1}:
-                case {x: -1, y: 0, z: -1}:
-                case {x: -1, y: 0, z: 1}:
-                    return SubBlockType.MiddleEdge;
-                case {x: 0, y: -1, z: -1}:
-                case {x: 0, y: -1, z: 1}:
-                case {x: 1, y: -1, z: 0}:
-                case {x: -1, y: -1, z: 0}:
-                    return SubBlockType.BottomEdge;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(coordinate), coordinate, null);
+                return SubBlockType.Center;
             }
-        }
-        
-        public static Quaternion GetRotationFromCoordinate(Vector3Int coordinate)
-        {
-            switch (coordinate)
+            if (crossSum == 1) // Face
             {
-                case { x: 0, z: 0 }:
-                case { x: 1, z: 1 }:
-                case { x: 1, z: 0 }:
-                    return Quaternion.identity;
-                case { x: -1, z: 1 }:
-                case { x: 0, z: 1 }:
-                    return Quaternion.Euler(0, -90, 0);
-                case { x: -1, z: -1 }:
-                case { x: -1, z: 0 }:
-                    return Quaternion.Euler(0, 180, 0);
-                case { x: 1, z: -1 }:
-                case { x: 0, z: -1 }:
-                    return Quaternion.Euler(0, 90, 0);
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(coordinate), coordinate, null);
+                return coordinates.y switch
+                {
+                    1 => SubBlockType.TopFace,
+                    -1 => SubBlockType.BottomFace,
+                    _ => SubBlockType.MiddleFace
+                };
             }
-        }
-
-        public static SubBlockType GetNeighborTypeInDirection(this SubBlockType originType, Vector3Int direction)
-        {
-            return originType switch
+            if (crossSum == 2) // Edge
             {
-                SubBlockType.TopCorner => GetNeighborTypeInDirectionForTopCorner(direction),
-                SubBlockType.BottomCorner => GetNeighborTypeInDirectionForBottomCorner(direction),
-                SubBlockType.TopEdge => GetNeighborTypeInDirectionForTopEdge(direction),
-                SubBlockType.MiddleEdge => GetNeighborTypeInDirectionForMiddleEdge(direction),
-                SubBlockType.BottomEdge => GetNeighborTypeInDirectionForBottomEdge(direction),
-                SubBlockType.TopFace => GetNeighborTypeInDirectionForTopFace(direction),
-                SubBlockType.MiddleFace => GetNeighborTypeInDirectionForMiddleFace(direction),
-                SubBlockType.BottomFace => GetNeighborTypeInDirectionForBottomFace(direction),
-                SubBlockType.Center => GetNeighborTypeInDirectionForCenter(direction),
-                _ => throw new ArgumentOutOfRangeException(nameof(originType), originType, null)
-            };
-        }
-        
-        private static SubBlockType GetNeighborTypeInDirectionForTopCorner(Vector3Int direction)
-        {
-            return direction switch
+                return coordinates.y switch
+                {
+                    1 => SubBlockType.TopEdge,
+                    -1 => SubBlockType.BottomEdge,
+                    _ => SubBlockType.MiddleEdge
+                };
+            }
+            if (crossSum == 3)
             {
-                { x: 1, y: 0, z: 0 } => SubBlockType.TopCorner,
-                { x: 0, y: 0, z: 1 } => SubBlockType.TopCorner,
-                { x: -1, y: 0, z: 0 } => SubBlockType.TopEdge,
-                { x: 0, y: 0, z: -1 } => SubBlockType.TopEdge,
-                { x: 0, y: 1, z: 0 } => SubBlockType.BottomCorner,
-                { x: 0, y: -1, z: 0 } => SubBlockType.MiddleEdge,
-                _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
-            };
-        }
-        
-        private static SubBlockType GetNeighborTypeInDirectionForBottomCorner(Vector3Int direction)
-        {
-            return direction switch
-            {
-                { x: 1, y: 0, z: 0 } => SubBlockType.BottomCorner,
-                { x: 0, y: 0, z: 1 } => SubBlockType.BottomCorner,
-                { x: -1, y: 0, z: 0 } => SubBlockType.BottomEdge,
-                { x: 0, y: 0, z: -1 } => SubBlockType.BottomEdge,
-                { x: 0, y: 1, z: 0 } => SubBlockType.MiddleEdge,
-                { x: 0, y: -1, z: 0 } => SubBlockType.TopCorner,
-                _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
-            };
-        }
-        
-        private static SubBlockType GetNeighborTypeInDirectionForTopEdge(Vector3Int direction)
-        {
-            return direction switch
-            {
-                { x: 1, y: 0, z: 0 } => SubBlockType.TopEdge,
-                { x: 0, y: 0, z: 1 } => SubBlockType.TopCorner,
-                { x: -1, y: 0, z: 0 } => SubBlockType.TopFace,
-                { x: 0, y: 0, z: -1 } => SubBlockType.TopCorner,
-                { x: 0, y: 1, z: 0 } => SubBlockType.BottomEdge,
-                { x: 0, y: -1, z: 0 } => SubBlockType.MiddleFace,
-                _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
-            };
-        }
-        
-        private static SubBlockType GetNeighborTypeInDirectionForMiddleEdge(Vector3Int direction)
-        {
-            return direction switch
-            {
-                { x: 1, y: 0, z: 0 } => SubBlockType.MiddleEdge,
-                { x: 0, y: 0, z: 1 } => SubBlockType.MiddleEdge,
-                { x: -1, y: 0, z: 0 } => SubBlockType.MiddleFace,
-                { x: 0, y: 0, z: -1 } => SubBlockType.MiddleFace,
-                { x: 0, y: 1, z: 0 } => SubBlockType.TopCorner,
-                { x: 0, y: -1, z: 0 } => SubBlockType.BottomCorner,
-                _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
-            };
-        }
-        
-        private static SubBlockType GetNeighborTypeInDirectionForBottomEdge(Vector3Int direction)
-        {
-            return direction switch
-            {
-                { x: 1, y: 0, z: 0 } => SubBlockType.BottomEdge,
-                { x: 0, y: 0, z: 1 } => SubBlockType.BottomCorner,
-                { x: -1, y: 0, z: 0 } => SubBlockType.BottomFace,
-                { x: 0, y: 0, z: -1 } => SubBlockType.BottomCorner,
-                { x: 0, y: 1, z: 0 } => SubBlockType.MiddleFace,
-                { x: 0, y: -1, z: 0 } => SubBlockType.TopEdge,
-                _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
-            };
-        }
-        
-        private static SubBlockType GetNeighborTypeInDirectionForTopFace(Vector3Int direction)
-        {
-            return direction switch
-            {
-                { x: 1, y: 0, z: 0 } => SubBlockType.TopEdge,
-                { x: 0, y: 0, z: 1 } => SubBlockType.TopEdge,
-                { x: -1, y: 0, z: 0 } => SubBlockType.TopEdge,
-                { x: 0, y: 0, z: -1 } => SubBlockType.TopEdge,
-                { x: 0, y: 1, z: 0 } => SubBlockType.BottomFace,
-                { x: 0, y: -1, z: 0 } => SubBlockType.Center,
-                _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
-            };
-        }
-        
-        private static SubBlockType GetNeighborTypeInDirectionForMiddleFace(Vector3Int direction)
-        {
-            return direction switch
-            {
-                { x: 1, y: 0, z: 0 } => SubBlockType.MiddleFace,
-                { x: 0, y: 0, z: 1 } => SubBlockType.MiddleEdge,
-                { x: -1, y: 0, z: 0 } => SubBlockType.Center,
-                { x: 0, y: 0, z: -1 } => SubBlockType.MiddleEdge,
-                { x: 0, y: 1, z: 0 } => SubBlockType.TopEdge,
-                { x: 0, y: -1, z: 0 } => SubBlockType.BottomEdge,
-                _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
-            };
-        }
-        
-        private static SubBlockType GetNeighborTypeInDirectionForBottomFace(Vector3Int direction)
-        {
-            return direction switch
-            {
-                { x: 1, y: 0, z: 0 } => SubBlockType.BottomEdge,
-                { x: 0, y: 0, z: 1 } => SubBlockType.BottomEdge,
-                { x: -1, y: 0, z: 0 } => SubBlockType.BottomEdge,
-                { x: 0, y: 0, z: -1 } => SubBlockType.BottomEdge,
-                { x: 0, y: 1, z: 0 } => SubBlockType.Center,
-                { x: 0, y: -1, z: 0 } => SubBlockType.TopFace,
-                _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
-            };
-        }
-        
-        private static SubBlockType GetNeighborTypeInDirectionForCenter(Vector3Int direction)
-        {
-            return direction switch
-            {
-                { x: 1, y: 0, z: 0 } => SubBlockType.MiddleFace,
-                { x: 0, y: 0, z: 1 } => SubBlockType.MiddleFace,
-                { x: -1, y: 0, z: 0 } => SubBlockType.MiddleFace,
-                { x: 0, y: 0, z: -1 } => SubBlockType.MiddleFace,
-                { x: 0, y: 1, z: 0 } => SubBlockType.TopFace,
-                { x: 0, y: -1, z: 0 } => SubBlockType.BottomFace,
-                _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
-            };
+                return coordinates.y switch
+                {
+                    1 => SubBlockType.TopCorner,
+                    -1 => SubBlockType.BottomCorner,
+                    _ => throw new ArgumentException()
+                };
+            }
+            
+            throw new ArgumentException($"Coordinates {coordinates} do not match the subBlockType coordinate format.");
         }
 
         public static bool TryExtractSubBlockTypeFromName(string name, out SubBlockType subBlockType)
@@ -241,6 +69,30 @@ namespace WFC
             }
             
             subBlockType = default;
+            return false;
+        }
+
+        public static bool TryExtractBuildingTypeFromName(string name, out BuildingType buildingType)
+        {
+            var prefixPairs = new Dictionary<string, BuildingType>
+            {
+                {"R_", BuildingType.Residential},
+                {"G_", BuildingType.Greenhouse},
+                {"F_", BuildingType.Factory},
+                {"M_", BuildingType.MailBuilding},
+                {"S_", BuildingType.ShopBuilding}
+            };
+
+            foreach (var (prefix, type) in prefixPairs)
+            {
+                if (name.StartsWith(prefix))
+                {
+                    buildingType = type;
+                    return true;
+                }
+            }
+            
+            buildingType = default;
             return false;
         }
     }

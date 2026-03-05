@@ -64,6 +64,20 @@ public static class Vector3IntExtension
 
         throw new ArgumentException($"{v} is not an unit axis vector!");
     }
+    
+    public static int Get90RotationsAroundYTo(this Vector3Int from, Vector3Int to)
+    {
+        var rotatedFrom = from;
+        for (int rotationsNeeded = 0; rotationsNeeded < 4; rotationsNeeded++)
+        {
+            if (rotatedFrom == to)
+                return rotationsNeeded;
+
+            rotatedFrom = rotatedFrom.Rotate90(Vector3Int.up, 1);            
+        }
+        
+        throw new ArgumentException($"Vector {to} is not a 90 degree rotation of vector {from}.");
+    }
 
     public static List<Vector3Int> Neighbours(this Vector3Int v)
     {
@@ -77,5 +91,54 @@ public static class Vector3IntExtension
             v + Vector3Int.back
         };
         return neighbours;
+    }
+
+    public static List<Vector3Int> GetSurrounding3x3Coordinates(this Vector3Int center, Vector3Int axisDirection)
+    {
+        var surrounding3x3Coordinates = new List<Vector3Int>();
+        if (axisDirection.x != 0)
+        {
+            for (int y = -1; y < 2; y++)
+            {
+                for (int z = -1; z < 2; z++)
+                {
+                    surrounding3x3Coordinates.Add(new Vector3Int(center.x, center.y + y, center.z + z));
+                }
+            }
+        }
+        else if (axisDirection.y != 0)
+        {
+            for (int x = -1; x < 2; x++)
+            {
+                for (int z = -1; z < 2; z++)
+                {
+                    surrounding3x3Coordinates.Add(new Vector3Int(center.x + x, center.y, center.z + z));
+                }
+            }
+        }
+        else if (axisDirection.z != 0)
+        {
+            for (int x = -1; x < 2; x++)
+            {
+                for (int y = -1; y < 2; y++)
+                {
+                    surrounding3x3Coordinates.Add(new Vector3Int(center.x + x, center.y + y, center.z));
+                }
+            }
+        }
+        
+        return surrounding3x3Coordinates;
+    }
+
+    public static Vector3Int GetWrappedNeg1To1(this Vector3Int v)
+    {
+        if (Math.Abs(v.x) > 2 || Math.Abs(v.y) > 2 || Math.Abs(v.z) > 2)
+            throw new ArgumentOutOfRangeException($"Vector {v} has elements bigger than 2. This is will lead to unintended results.");
+        
+        return new Vector3Int(
+            Math.Abs(v.x) > 1 ? -Math.Sign(v.x) : v.x,
+            Math.Abs(v.y) > 1 ? -Math.Sign(v.y) : v.y,
+            Math.Abs(v.z) > 1 ? -Math.Sign(v.z) : v.z
+        );
     }
 }

@@ -5,6 +5,7 @@
         Residential,
         Greenhouse,
         Factory,
-        PostOffice
+        MailBuilding,
+        ShopBuilding
     }
 }

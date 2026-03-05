@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using DefaultNamespace;
 using UnityEngine;
 
 public class ResidentialBuilding : Building
@@ -22,6 +21,6 @@ public class ResidentialBuilding : Building
 
         newResidents += Math.Min(cluster.Count - 1, MAX_CLUSTER_INCREMENT) * RESIDENCY_INCREMENT;
         
-        return new PlacementResults(Math.Max(newResidents, 0), 0, 0);
+        return new PlacementResults(Math.Max(newResidents, 0), -5, 0);
     }
 }

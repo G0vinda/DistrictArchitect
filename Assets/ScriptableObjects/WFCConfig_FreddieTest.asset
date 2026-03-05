@@ -1,0 +1,374 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ddea6baa848c573469c580761a130fd5, type: 3}
+  m_Name: WFCConfig_FreddieTest
+  m_EditorClassIdentifier: 
+  serializedIds: 000000000100000002000000030000000400000005000000060000000700000008000000090000000a0000000b0000000c0000000d0000000e0000000f00000010000000110000001200000013000000140000001500000016000000170000001b0000001c0000001d0000001e0000001f0000002000000021000000220000002300000024000000
+  serializedBuildingTypes: 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  serializedTypes: 01000000040000000700000008000000030000000600000000000000020000000500000001000000040000000300000006000000000000000200000001000000030000000000000001000000030000000000000002000000020000000000000005000000040000000400000001000000010000000100000001000000000000000000000000000000
+  serializedPrefabs:
+  - value:
+    - {fileID: 5736510521578983849, guid: f8ef918187626b141bbb98be6a5d9f29, type: 3}
+  - value:
+    - {fileID: 6614398284307386272, guid: 091cf7759cc5a064990cd35a532a72a5, type: 3}
+  - value:
+    - {fileID: 2937149831583214010, guid: 62974b6dbe211b04e936130f4b69e605, type: 3}
+  - value:
+    - {fileID: 6670770329389484160, guid: 4e689fe5d38cbca4cbb2b82fc67a477d, type: 3}
+  - value:
+    - {fileID: 8437961999751202468, guid: 8dda0a7cc1dd80c48b99e6b023c5b233, type: 3}
+    - {fileID: 8437961999751202468, guid: 5f1fbeff8510dde48a02f8876274ccdd, type: 3}
+    - {fileID: 8437961999751202468, guid: 08a6115fbefa29f4e8242bd8b636d74b, type: 3}
+  - value:
+    - {fileID: 6873831753838586547, guid: 4fea43fb2d8600b46af3330878730156, type: 3}
+    - {fileID: 6873831753838586547, guid: f9e85d1b1babdc84c8f216a03ebe6880, type: 3}
+    - {fileID: 6873831753838586547, guid: 80738a793af87e849a735211e8b8a113, type: 3}
+  - value:
+    - {fileID: 2508424541508495790, guid: ed6513f10ae80e943971de8199800bfa, type: 3}
+    - {fileID: 1446676793715246934, guid: f951907eabd754e449b571a88dd38b7a, type: 3}
+  - value:
+    - {fileID: 7546720408627876149, guid: 9de020fb2482cde4d8140ffbfb8331a9, type: 3}
+    - {fileID: 7675164621744208514, guid: 682e7092de89f8c41b839740a54189be, type: 3}
+  - value:
+    - {fileID: 8145798743446344604, guid: 700c10140c7c58748bddd2f58226d7d8, type: 3}
+    - {fileID: 3253933242397060500, guid: 63bf1fcb680df3e47a4bd9fcc45fa5d6, type: 3}
+  - value:
+    - {fileID: 3480622777390535405, guid: 2a175aa4a8bafb44ab6118149b6a0d9b, type: 3}
+  - value:
+    - {fileID: 289584050713817806, guid: 8cc1138a0fc1c124ca3b14dbb2a6862d, type: 3}
+  - value:
+    - {fileID: 5748490707156490928, guid: ec925869e4df27349be9b530b6e4d297, type: 3}
+  - value:
+    - {fileID: 4235260167705509726, guid: bc5a8676f33d8b84abe51755da50d74f, type: 3}
+  - value:
+    - {fileID: 3555225383120617221, guid: 87d5efdfbecc4514ba1dc3bcfbffa420, type: 3}
+  - value:
+    - {fileID: 1085951530232997856, guid: 01217e25c5c767b47bb01b89f9bd727e, type: 3}
+  - value:
+    - {fileID: 3480622777390535405, guid: 5e2dd8d062df62d46a06a31b27c104f5, type: 3}
+  - value:
+    - {fileID: 5748490707156490928, guid: 8a757d5e476eaec40b72ff296a100fac, type: 3}
+  - value:
+    - {fileID: 3555225383120617221, guid: ae94b41f2dd568642af0361e9acf8bfb, type: 3}
+  - value:
+    - {fileID: 3480622777390535405, guid: 4592e575858caf14f924aff7311ca16c, type: 3}
+  - value:
+    - {fileID: 5748490707156490928, guid: 70a57b46e53d015448ed591364c05a92, type: 3}
+  - value:
+    - {fileID: 3555225383120617221, guid: 33f62dcc4f4841744b426bb72a40fd67, type: 3}
+  - value:
+    - {fileID: 6873831753838586547, guid: 507f187dcce6ab240a21e5a54852bdbb, type: 3}
+  - value:
+    - {fileID: 1085951530232997856, guid: e1d75f4d30687e14cb1e0b91677c028b, type: 3}
+  - value:
+    - {fileID: 8437961999751202468, guid: b51038805310be643abf2242ddbdafd7, type: 3}
+  - value:
+    - {fileID: 6670770329389484160, guid: a87d507e1c0bb384eb591eab2601de2f, type: 3}
+  - value:
+    - {fileID: 6873831753838586547, guid: 64ed4d26e3e646c4286af1e7235ce583, type: 3}
+  - value:
+    - {fileID: 289584050713817806, guid: 10b6ecd4d346c4149aba20790be78ef2, type: 3}
+  - value:
+    - {fileID: 8437961999751202468, guid: f815c91d5213f5347872b0f51a9650d0, type: 3}
+  - value:
+    - {fileID: 8437961999751202468, guid: fa0d9f74be31f27458657f7d939b0dbd, type: 3}
+  - value:
+    - {fileID: 8437961999751202468, guid: f2b45bd46530bb342acdc7cd11f7ec4d, type: 3}
+  - value:
+    - {fileID: 5748490707156490928, guid: 47b7854e305d1bd47b7159dd3b4de8fc, type: 3}
+  - value:
+    - {fileID: 5748490707156490928, guid: 82320a212d3c5684182a0c95c35d3926, type: 3}
+  - value:
+    - {fileID: 5748490707156490928, guid: 0749773eea0dcb84283ebce4c14f9781, type: 3}
+  - value:
+    - {fileID: 5748490707156490928, guid: ac469eb619894844cb466477bd85107a, type: 3}
+  serializedProbabilities:
+  - value:
+    - 1
+  - value:
+    - 1
+  - value:
+    - 1
+  - value:
+    - 1
+  - value:
+    - 1
+    - 0.5
+    - 0.5
+  - value:
+    - 1
+    - 1
+    - 1
+  - value:
+    - 1
+    - 1
+  - value:
+    - 1
+    - 1
+  - value:
+    - 1
+    - 1
+  - value:
+    - 1
+  - value:
+    - 1
+  - value:
+    - 1
+  - value:
+    - 1
+  - value:
+    - 1
+  - value:
+    - 1
+  - value:
+    - 1
+  - value:
+    - 1
+  - value:
+    - 1
+  - value:
+    - 1
+  - value:
+    - 1
+  - value:
+    - 1
+  - value:
+    - 1
+  - value:
+    - 1
+  - value:
+    - 1
+  - value:
+    - 1
+  - value:
+    - 1
+  - value:
+    - 1
+  - value:
+    - 1
+  - value:
+    - 1
+  - value:
+    - 1
+  - value:
+    - 1
+  - value:
+    - 1
+  - value:
+    - 1
+  - value:
+    - 1
+  serializedNeighborArrays:
+  - positiveZ: ffffffff
+    negativeZ: 01000000
+    positiveX: ffffffff
+    negativeX: 01000000
+    positiveY: 04000000
+    negativeY: ffffffff
+  - positiveZ: 0000000009000000
+    negativeZ: 0000000012000000
+    positiveX: ffffffff
+    negativeX: 02000000
+    positiveY: 05000000
+    negativeY: ffffffff
+  - positiveZ: 010000000a0000001c0000001d000000
+    negativeZ: 010000000a0000001c0000001d000000
+    positiveX: 010000000a0000001c0000001d000000
+    negativeX: 010000000a0000001c0000001d000000
+    positiveY: 03000000
+    negativeY: ffffffff1b000000
+  - positiveZ: 050000000c000000
+    negativeZ: 050000000c000000
+    positiveX: 050000000c000000
+    negativeX: 050000000c000000
+    positiveY: 080000001b000000
+    negativeY: 02000000
+  - positiveZ: ffffffff
+    negativeZ: 05000000
+    positiveX: ffffffff
+    negativeX: 05000000
+    positiveY: 0600000017000000
+    negativeY: 000000001e000000
+  - positiveZ: 040000000b000000
+    negativeZ: 0400000013000000
+    positiveX: ffffffff
+    negativeX: 03000000
+    positiveY: 0700000015000000
+    negativeY: 010000001c000000
+  - positiveZ: ffffffff
+    negativeZ: 07000000
+    positiveX: ffffffff
+    negativeX: 07000000
+    positiveY: ffffffff
+    negativeY: 04000000
+  - positiveZ: 060000000d000000
+    negativeZ: 0600000014000000
+    positiveX: ffffffff
+    negativeX: 080000001b000000
+    positiveY: ffffffff
+    negativeY: 05000000
+  - positiveZ: 070000000e0000001500000016000000
+    negativeZ: 070000000e0000001500000016000000
+    positiveX: 070000000e000000
+    negativeX: 070000000e0000001500000016000000
+    positiveY: ffffffff
+    negativeY: 03000000
+  - positiveZ: 0f000000120000001f00000021000000
+    negativeZ: 01000000
+    positiveX: ffffffff
+    negativeX: 0a000000
+    positiveY: 0b000000
+    negativeY: ffffffff
+  - positiveZ: 0f00000012000000
+    negativeZ: 090000000f000000
+    positiveX: 0a0000000a0000001d000000
+    negativeX: 02000000
+    positiveY: 0c000000
+    negativeY: ffffffff
+  - positiveZ: 1000000013000000
+    negativeZ: 05000000
+    positiveX: ffffffff
+    negativeX: 0c000000
+    positiveY: 0d00000023000000
+    negativeY: 0900000020000000
+  - positiveZ: 1000000013000000
+    negativeZ: 0b00000010000000
+    positiveX: 0c0000000c000000
+    negativeX: 03000000
+    positiveY: 0e00000016000000
+    negativeY: 0a0000001d000000
+  - positiveZ: 14000000110000002200000024000000
+    negativeZ: 07000000
+    positiveX: ffffffff
+    negativeX: 0e000000
+    positiveY: ffffffff
+    negativeY: 0b000000
+  - positiveZ: 1100000014000000
+    negativeZ: 0d00000011000000
+    positiveX: 0e0000000e00000016000000
+    negativeX: 080000001b000000
+    positiveY: ffffffff
+    negativeY: 0c000000
+  - positiveZ: 0f0000000f000000120000001f00000021000000
+    negativeZ: 0a000000
+    positiveX: 090000000f0000000f0000002000000021000000
+    negativeX: 0a000000
+    positiveY: 10000000
+    negativeY: ffffffff
+  - positiveZ: 100000001000000013000000
+    negativeZ: 0c000000
+    positiveX: 0b0000001000000010000000
+    negativeX: 0c000000
+    positiveY: 1100000024000000
+    negativeY: 0f00000021000000
+  - positiveZ: 1100000011000000140000002200000024000000
+    negativeZ: 0e000000
+    positiveX: 11000000110000000d0000002300000024000000
+    negativeX: 0e000000
+    positiveY: ffffffff
+    negativeY: 10000000
+  - positiveZ: ffffffff
+    negativeZ: 0a000000
+    positiveX: 0f000000090000002000000021000000
+    negativeX: 01000000
+    positiveY: 13000000
+    negativeY: ffffffff
+  - positiveZ: ffffffff
+    negativeZ: 0c000000
+    positiveX: 0b00000010000000
+    negativeX: 05000000
+    positiveY: 1400000022000000
+    negativeY: 120000001f000000
+  - positiveZ: ffffffff
+    negativeZ: 0e000000
+    positiveX: 0d000000110000002300000024000000
+    negativeX: 07000000
+    positiveY: ffffffff
+    negativeY: 13000000
+  - positiveZ: 1700000023000000
+    negativeZ: 1700000022000000
+    positiveX: ffffffff
+    negativeX: 1b000000
+    positiveY: 1c0000001d000000
+    negativeY: 05000000
+  - positiveZ: 2200000024000000
+    negativeZ: 2300000024000000
+    positiveX: 0e0000001600000016000000
+    negativeX: 1b000000
+    positiveY: 1c0000001d000000
+    negativeY: 0c000000
+  - positiveZ: ffffffff
+    negativeZ: 15000000
+    positiveX: ffffffff
+    negativeX: 15000000
+    positiveY: 1e0000001f0000002000000021000000
+    negativeY: 04000000
+  - positiveZ: 070000000e0000001500000016000000
+    negativeZ: 070000000e0000001500000016000000
+    positiveX: 070000000e0000001500000016000000
+    negativeX: 070000000e0000001500000016000000
+    positiveY: 02000000
+    negativeY: 03000000
+  - positiveZ: 200000001e000000
+    negativeZ: 1e0000001f000000
+    positiveX: ffffffff
+    negativeX: 02000000
+    positiveY: 05000000
+    negativeY: 1500000016000000
+  - positiveZ: 1f00000021000000
+    negativeZ: 2100000020000000
+    positiveX: 0a0000001d0000001d000000
+    negativeX: 02000000
+    positiveY: 0c000000
+    negativeY: 1500000016000000
+  - positiveZ: ffffffff
+    negativeZ: 1c000000
+    positiveX: ffffffff
+    negativeX: 1c000000
+    positiveY: 04000000
+    negativeY: 17000000220000002300000024000000
+  - positiveZ: ffffffff
+    negativeZ: 1d000000
+    positiveX: 090000000f0000002000000021000000
+    negativeX: 1c000000
+    positiveY: 13000000
+    negativeY: 17000000220000002300000024000000
+  - positiveZ: 0f000000120000001f00000021000000
+    negativeZ: 1c000000
+    positiveX: ffffffff
+    negativeX: 1d000000
+    positiveY: 0b000000
+    negativeY: 17000000220000002300000024000000
+  - positiveZ: 0f000000120000001f0000002100000021000000
+    negativeZ: 1d000000
+    positiveX: 090000000f000000200000002100000021000000
+    negativeX: 1d000000
+    positiveY: 10000000
+    negativeY: 17000000220000002300000024000000
+  - positiveZ: ffffffff
+    negativeZ: 16000000
+    positiveX: 0d000000110000002300000024000000
+    negativeX: 15000000
+    positiveY: 1e0000001f0000002000000021000000
+    negativeY: 13000000
+  - positiveZ: 11000000140000002200000024000000
+    negativeZ: 15000000
+    positiveX: ffffffff
+    negativeX: 16000000
+    positiveY: 1e0000001f0000002000000021000000
+    negativeY: 0b000000
+  - positiveZ: 1100000014000000220000002400000024000000
+    negativeZ: 16000000
+    positiveX: 0d00000011000000230000002400000024000000
+    negativeX: 16000000
+    positiveY: 1e0000001f0000002000000021000000
+    negativeY: 10000000

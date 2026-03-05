@@ -1,0 +1,98 @@
+.warningInputField > .unity-label {
+    color: rgb(255, 87, 28);
+}
+
+.warningInputField > .unity-base-field__input {
+    border-color: rgb(255, 87, 28);
+}
+
+AllowedNeighborList .header {
+    -unity-font-style: bold;
+    margin: 5px 0 5px 0;
+    margin-bottom: 3px;
+    margin-top: 4px;
+}
+
+AllowedNeighborList .indentation {
+    width: 35px;
+}
+
+AllowedNeighborList {
+    flex-direction: row;
+    margin-bottom: 10px;
+}
+
+AllowedNeighborList > .list {
+    flex-grow: 1;
+}
+
+AllowedNeighborListElement {
+    flex-direction: row;
+    align-items: center;
+    background-color: rgba(90, 90, 90, 0.7);
+    border-radius: 5px;
+    justify-content: space-between;
+    margin-right: 10px;
+    margin-bottom: 2px;
+    margin-top: 2px;
+}
+
+.allowed-neighbor {
+    background-color: rgb(105, 105, 105);
+}
+
+AllowedNeighborListElement > Switch {
+    margin-right: 5px;
+}
+
+.allowed-neighbor-sublist {
+    margin-bottom: 10px;
+}
+
+Button {
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+.sub-block-list-element {
+    background-color: rgb(46, 46, 46);
+    margin: 2px 0 2px 0;
+    font-size: 12px;
+}
+
+.sub-block-list-element Button {
+    font-size: 12px;
+    margin-right: 0;
+}
+
+.variant-list-element-main > #PreviewImageContainer {
+    display: none;
+}
+
+.variant-list-element-main > #NameLabel {
+    display: flex;
+    -unity-font-style: bold;
+}
+
+.variant-list-element-main > #DeleteButton {
+    display: none;
+}
+
+.variant-list {
+    margin-right: 5px;
+    margin-left: 2px;
+}
+
+.variant-list-element-main {
+    display: flex;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.variant-list-element {
+    margin-top: 1px;
+    margin-bottom: 1px;
+}
+
+.variant-list-element-main {
+}

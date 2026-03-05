@@ -18,9 +18,8 @@ public class BuildingPlacement : MonoBehaviour
     [SerializeField] private Material buildingPreviewDisabledMaterial;
     [SerializeField] private float previewMaterialAlpha = 0.6f;
     [SerializeField] private UnityEvent<int> floorChanged;
-    
 
-public bool IsPlacing => currentShape != null;
+    public bool IsPlacing => currentShape != null;
     public Grid Grid { get; private set; }
     
     public Action<Vector3> PlacedBuilding;
