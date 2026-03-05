@@ -177,7 +177,7 @@ namespace WFC
             {
                 probabilityThresholdsById.Add(id, ((float[])config.SubBlockTable.Rows.Find(id)[WfcConfig.PROBABILITIES_COLUMN_INDEX]).Sum());
             }
-            var maxProbabilityValue = probabilityThresholdsById.Values.Max();
+            var maxProbabilityValue = probabilityThresholdsById.Values.Sum();
             var randomSelectionValue = Random.Range(0, maxProbabilityValue);
             var currentSelectionThreshold = .0f;
             foreach (var (id, probabilityThreshold) in probabilityThresholdsById)
