@@ -1,0 +1,70 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ddea6baa848c573469c580761a130fd5, type: 3}
+  m_Name: WFCConfig_Toni_Test
+  m_EditorClassIdentifier: 
+  serializedIds: 28000000290000002a0000002b0000002f000000
+  serializedBuildingTypes: 0000000000000000000000000000000000000000
+  serializedTypes: 0500000000000000020000000000000002000000
+  serializedPrefabs:
+  - value:
+    - {fileID: 9042430838206380746, guid: 1014bd86177feee44905d77c24aac806, type: 3}
+  - value:
+    - {fileID: 9049857870978291770, guid: de48c67fdcb9ba644a4b85d3873ebab0, type: 3}
+  - value:
+    - {fileID: 5404120846207721940, guid: 4388970cf1f97454f83eed89008985c9, type: 3}
+  - value:
+    - {fileID: 7166887212215933796, guid: d11a4efffcb5d954bb9e94beaa346b0e, type: 3}
+  - value:
+    - {fileID: 180346203583362838, guid: 879d5e27199c86d40bc0f714dabc0b10, type: 3}
+  serializedProbabilities:
+  - value:
+    - 1
+  - value:
+    - 1
+  - value:
+    - 1
+  - value:
+    - 1
+  - value:
+    - 1
+  serializedNeighborArrays:
+  - positiveZ: 2a0000002f000000
+    negativeZ: 2a0000002f000000
+    positiveX: 2a0000002f000000
+    negativeX: 2a0000002f000000
+    positiveY: ffffffff
+    negativeY: 
+  - positiveZ: 29000000ffffffff290000002b000000
+    negativeZ: 2a0000002f000000
+    positiveX: 29000000ffffffff290000002b000000
+    negativeX: 2a0000002f000000
+    positiveY: ffffffff
+    negativeY: 
+  - positiveZ: 290000002b000000
+    negativeZ: 290000002b000000
+    positiveX: 2a000000ffffffff2a0000002f000000
+    negativeX: 28000000
+    positiveY: ffffffff
+    negativeY: 
+  - positiveZ: 290000002b000000ffffffff2b000000
+    negativeZ: 2a0000002f000000
+    positiveX: 290000002b000000ffffffff2b000000
+    negativeX: 2a0000002f000000
+    positiveY: ffffffff
+    negativeY: 
+  - positiveZ: 290000002b000000
+    negativeZ: 290000002b000000
+    positiveX: 2a0000002f000000ffffffff2f000000
+    negativeX: 28000000
+    positiveY: ffffffff
+    negativeY: 
