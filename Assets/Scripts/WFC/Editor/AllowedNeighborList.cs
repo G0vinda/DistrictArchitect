@@ -5,7 +5,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace WFC
+namespace WFC.Editor
 {
     [UxmlElement]
     public partial class AllowedNeighborList : VisualElement

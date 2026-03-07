@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 9a34a7dda9594c748a11ed42dad818c6
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - m_ViewDataDictionary: {instanceID: 0}
+  - mainVisualTreeAsset: {fileID: 9197481963319205126, guid: bafb5a091e6ef4742805a187093c6f16, type: 3}
+  - subBlockPlaceholderPrefab: {fileID: 1306612062979952834, guid: 9dfb24043bf1c30419cc9d1645e4e37e, type: 3}
+  - highLightPrefab: {fileID: 1306612062979952834, guid: 218c4006379a1ee489835a053d9ce372, type: 3}
+  - previewNameInfo: {fileID: 374722588156701612, guid: 8540f2aac6834d14c9d903008edde20c, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -358,7 +358,7 @@ namespace WFC
                 SubBlockTable.Rows.Add(row);
             }
         }
-        
+
         private void MarkTableAsDirty(bool forceUIRefresh = true)
         {
             _subBlockTableIsDirty = true;

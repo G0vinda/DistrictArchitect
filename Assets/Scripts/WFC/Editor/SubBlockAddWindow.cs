@@ -1,11 +1,9 @@
 ﻿using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
-using WFC.Editor;
 
-namespace WFC
+namespace WFC.Editor
 {
     public class SubBlockAddWindow : EditorWindow
     {
@@ -61,17 +59,7 @@ namespace WFC
                 var newPrefab = (GameObject)evt.newValue;
                 var prefabPreviewTexture = EditorUtils.GetPrefabPreviewTexture(newPrefab, 200);
                 prefabPreviewTexture.ApplyOtherTextureInBottomRightCorner(axesIcon64);
-                _currentPreviewImage = new Image
-                {
-                    style =
-                    {
-                        width = prefabPreviewTexture.width,
-                        height = prefabPreviewTexture.height,
-                    },
-                    image = prefabPreviewTexture,
-                    scaleMode = ScaleMode.StretchToFill,
-                    tintColor = Color.white
-                };
+                _currentPreviewImage = EditorUtils.GenerateImage(prefabPreviewTexture);
                 
                 if (WfcConfig.DoesPrefabExistInDatabase(newPrefab))
                 {

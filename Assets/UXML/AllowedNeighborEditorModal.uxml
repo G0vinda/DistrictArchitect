@@ -1,0 +1,13 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <ui:VisualElement name="MainContainer" style="flex-grow: 1; width: 600px; height: 600px;">
+        <ui:Label text="Selecting allowed neighbors for " name="HeaderLabel" style="margin-top: 5px; margin-right: 5px; margin-bottom: 5px; margin-left: 5px; font-size: 16px;" />
+        <ui:VisualElement name="PreviewImageContainer" style="flex-grow: 1; width: 600px; height: 600px; margin-top: 5px; margin-bottom: 5px; align-items: center; justify-content: center;" />
+        <ui:VisualElement name="ButtonContainer_Default" style="flex-grow: 1; flex-direction: row; justify-content: flex-end; align-items: flex-end; display: flex;">
+            <ui:Button text="Forbid" name="ForbidButton" style="padding-top: 10px; padding-right: 25px; padding-bottom: 10px; padding-left: 25px; margin-top: 5px; margin-right: 5px; margin-bottom: 5px; margin-left: 5px; background-color: rgb(132, 79, 79); font-size: 14px;" />
+            <ui:Button text="Allow" name="AllowButton" style="padding-top: 10px; padding-right: 25px; padding-bottom: 10px; padding-left: 25px; margin-top: 5px; margin-right: 5px; margin-bottom: 5px; margin-left: 5px; background-color: rgb(70, 103, 77); font-size: 14px;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="ButtonContainer_Continue" style="flex-grow: 1; flex-direction: row; justify-content: flex-end; display: none; align-items: flex-end;">
+            <ui:Button text="Next SubBlock" name="ContinueButton" style="padding-top: 10px; padding-right: 25px; padding-bottom: 10px; padding-left: 25px; margin-top: 5px; margin-right: 5px; margin-bottom: 5px; margin-left: 5px; font-size: 14px;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

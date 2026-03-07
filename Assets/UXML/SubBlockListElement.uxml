@@ -14,6 +14,7 @@
             </ui:VisualElement>
             <ui:VisualElement name="VariantContainer" class="variant-list" style="flex-grow: 1; display: none;" />
             <ui:VisualElement name="ButtonContainer" style="flex-grow: 0; flex-direction: row; margin-top: 12px;">
+                <ui:Button text="Neighbor Editor" name="NeighborEditorButton" />
                 <ui:Button text="Edit" name="EditButton" style="padding-right: 10px; padding-left: 10px;" />
                 <ui:Button text="Add Variant" name="AddVariantButton" />
                 <ui:Button text="Mirror" name="MirrorButton" style="display: none;" />

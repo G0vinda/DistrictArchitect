@@ -128,6 +128,7 @@ namespace WFC.Editor
                 SetCallbackToListElementButton(element, () => OnSubBlockEditClicked(element, i), "EditButton");
                 SetCallbackToListElementButton(element, () => OnAddVariantToSubBlockClicked(i), "AddVariantButton");
                 SetCallbackToListElementButton(element, () => OnDeleteSubBlockClicked(element, i), "DeleteButton");
+                SetCallbackToListElementButton(element, () => AllowedNeighborToolWindow.Create(_filteredSubBlockList.GetRange(i, _filteredSubBlockList.Count - i), (WfcConfig)target), "NeighborEditorButton");
 
                 var subBlockType = (SubBlockType)subBlockRow[WfcConfig.TYPE_COLUMN_INDEX];
                 switch (subBlockType.GetDefaultCoordinate().y)

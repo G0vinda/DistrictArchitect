@@ -16,7 +16,7 @@ namespace WFC.Editor
             return texture;
         }
 
-        public static Image GenerateImage(Texture2D texture)
+        public static Image GenerateImage(Texture texture)
         {
             return new Image
             {
